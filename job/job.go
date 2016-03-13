@@ -1,6 +1,8 @@
 package job
 
 import (
+	"bytes"
+	"io/ioutil"
 	"log"
 	"sync"
 
@@ -9,10 +11,12 @@ import (
 )
 
 type QueueItem struct {
-	Filename    string
-	PoFile      *po.File
-	Tcache      tcache.Tcache
-	PostProcess func(string, string) error
+	Filename     string
+	PoFile       *po.File
+	Templates    tcache.Tcache
+	TemplateData *tcache.TemplateData
+	PostProcess  func(string, string) error
+	OutputDir    string
 }
 
 type QueueTracker struct {
@@ -22,7 +26,31 @@ type QueueTracker struct {
 
 func RunJob(qi *QueueItem) {
 	log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
+
 	// Do stuff here.
+
+	// This is where the dreams are made.  Or the nightmares.
+
+	// Create a memory buffer to store this intention
+	templateOutputBuffer := &bytes.Buffer{}
+	tmpl := qi.Templates[qi.Filename]
+	if tmpl == nil {
+		log.Fatalf("should not have been able to ask for template %v when it is not loaded", qi.Filename)
+	}
+	//log.Printf("%#v\n", tmpl)
+
+	err := tmpl.Execute(templateOutputBuffer, qi.TemplateData)
+	if err != nil {
+		log.Fatalf("Processing template named %#v, Execute says: %v", qi.Filename, err)
+	}
+
+	filename := qi.OutputDir + "/" + qi.Filename
+	log.Printf("write %s (%v bytes)\n", filename, templateOutputBuffer.Len())
+	err = ioutil.WriteFile(filename, templateOutputBuffer.Bytes(), 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func (qt *QueueTracker) RunQueue() {

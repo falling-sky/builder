@@ -9,16 +9,16 @@ import (
 	"text/template"
 
 	"github.com/falling-sky/builder/fileutil"
+	"github.com/falling-sky/builder/gitinfo"
+	"github.com/falling-sky/builder/po"
 )
 
 // Tcache contains a map of templates, key=filename (minus root directory name)
 type Tcache map[string]*template.Template
 
 type TemplateData struct {
-	Page        string
-	GetRevision string
-	Names       map[string]string
-	Translated  map[string]string
+	GitInfo *gitinfo.GitInfo
+	PoMap   po.MapStringFile
 }
 
 // TopFiles returns the list of templates found at the top level of the
@@ -55,15 +55,19 @@ func New(path string) (Tcache, error) {
 		return tc, err
 	}
 
-	FuncMap := make(template.FuncMap)
-	FuncMap["PROCESS"] = func(name string) (string, error) {
-		log.Printf("PROCESS: %v\n", name)
+	ReadFile := func(name string) (string, error) {
 		fname := path + "/" + name
 		b, err := ioutil.ReadFile(fname)
 		if err != nil {
 			return "", err
 		}
 		return string(b), nil
+	}
+
+	FuncMap := make(template.FuncMap)
+	FuncMap["PROCESS"] = func(name string) (string, error) {
+		//log.Printf("PROCESS: %v\n", name)
+		return ReadFile(name)
 	}
 
 	//log.Printf("%#v", f)
@@ -76,12 +80,22 @@ func New(path string) (Tcache, error) {
 		}
 		log.Printf("i %v fn %v\n", i, fn)
 
+		// For error messages
 		fname := path + "/" + fn
-		t, err := template.New("new").Delims(`[%`, `%]`).Funcs(FuncMap).ParseFiles(fname)
+
+		// Grab the template data from disk
+		content, err := ReadFile(fn)
 		if err != nil {
 			return tc, fmt.Errorf("Reading file %s: %s", fname, err)
 		}
-		tc[fn] = t
+
+		// Create a template object, and parse
+		root := template.New(fname).Delims(`[%`, `%]`).Funcs(FuncMap)
+		tmpl, err := root.Parse(content)
+		if err != nil {
+			return tc, fmt.Errorf("Reading file %s: %s", fname, err)
+		}
+		tc[fn] = tmpl
 	}
 
 	return tc, nil

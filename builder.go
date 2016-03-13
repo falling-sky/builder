@@ -3,13 +3,12 @@ package main
 import (
 	"flag"
 	"log"
-	"text/template"
 
+	"github.com/falling-sky/builder/gitinfo"
 	"github.com/falling-sky/builder/job"
 	"github.com/falling-sky/builder/po"
 	"github.com/falling-sky/builder/postprocess"
 	"github.com/falling-sky/builder/tcache"
-	"github.com/falling-sky/builder/tfuncs"
 )
 
 var templateDir = flag.String("templatedir", "templates", "Location of dir containing html, css, js subdirs")
@@ -25,21 +24,6 @@ var postTable = []postType{
 	{"html", postprocess.PostProcessHTML},
 	{"css", postprocess.PostProcessCSS},
 	{"js", postprocess.PostProcessJS},
-}
-
-// MakeFuncMap returns a function map to use with text/template
-func MakeFuncMap() template.FuncMap {
-	f := make(template.FuncMap)
-	f["include"] = tfuncs.Include
-	f["process"] = tfuncs.Include
-	return f
-}
-
-func must(a interface{}, b error) interface{} {
-	if b != nil {
-		log.Fatal(b)
-	}
-	return a
 }
 
 // I have languages loaded
@@ -60,12 +44,20 @@ func must(a interface{}, b error) interface{} {
 func main() {
 	flag.Parse()
 
+	// Start the job queue for templates
 	jobTracker := job.StartQueue()
 
+	// Load all langauges, calculate all percentages of completion.
 	languages, err := po.LoadAll(*poDir+"/falling-sky.pot", *poDir+"/dl")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Build up what we need to know about the project, that
+	// the templates will ask about.
+	td := &tcache.TemplateData{}
+	td.GitInfo = gitinfo.GetGitInfo()
+	td.PoMap = languages.ByLanguage
 
 	for _, tt := range postTable {
 		template, err := tcache.New(*templateDir + "/" + tt.extension)
@@ -76,14 +68,18 @@ func main() {
 		for _, file := range files {
 			for _, pofile := range languages.ByLanguage {
 				job := &job.QueueItem{
-					Filename: file,
-					PoFile:   pofile,
+					Filename:     file,
+					PoFile:       pofile,
+					Templates:    template,
+					TemplateData: td,
+					OutputDir:    *outputDir,
 				}
 				jobTracker.Add(job)
 			}
 
 		}
 	}
+	// Wait for all jobs to finish
 	jobTracker.Wait()
 
 }
