@@ -3,7 +3,7 @@ package fileutil
 import "testing"
 
 func TestFilesInDir(t *testing.T) {
-	found, err := FilesInDir("../html")
+	found, err := FilesInDir("../samples/html")
 	if err != nil {
 		t.Fatal(err)
 	}
