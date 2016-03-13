@@ -1,6 +1,6 @@
 [% PROCESS "inc/header.inc" %]
 [% $page := "locale" %]
-[% PROCESS "list-nav.inc" %]
+[% PROCESS "inc/list-nav.inc" %]
 
 <div id="content">
 
@@ -21,11 +21,11 @@
   </thead>
   <tbody>
 
-[% range $index, $element := .Names  %]
+[% range $index, $element := .PoMap  %]
 <tr>
 <td><a href="/index.html.[% $index %]"><code>[% $index %]</code></a></td>
-<td><a href="/index.html.[% $index %]">[% $element %]</a></td>
-<td></td>
+<td><a href="/index.html.[% $index %]">[% $element.Language %]</a></td>
+<td>[% $element.Translated %] / [% $element.OutOf %]</td>
 </tr>
 [% end %]
 </body>
