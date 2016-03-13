@@ -22,3 +22,13 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+
+# Editor files 
+*~ 
+
+# Samples while prototyping
+samples
+
+# Binaries
+builder
