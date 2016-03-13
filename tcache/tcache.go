@@ -2,6 +2,7 @@ package tcache
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"sort"
 	"strings"
@@ -12,6 +13,13 @@ import (
 
 // Tcache contains a map of templates, key=filename (minus root directory name)
 type Tcache map[string]*template.Template
+
+type TemplateData struct {
+	Page        string
+	GetRevision string
+	Names       map[string]string
+	Translated  map[string]string
+}
 
 // TopFiles returns the list of templates found at the top level of the
 // scanned directory.  The intention of this is that we can convert/expand
@@ -46,12 +54,32 @@ func New(path string) (Tcache, error) {
 	if err != nil {
 		return tc, err
 	}
+
+	FuncMap := make(template.FuncMap)
+	FuncMap["PROCESS"] = func(name string) (string, error) {
+		log.Printf("PROCESS: %v\n", name)
+		fname := path + "/" + name
+		b, err := ioutil.ReadFile(fname)
+		if err != nil {
+			return "", err
+		}
+		return string(b), nil
+	}
+
 	//log.Printf("%#v", f)
 	for i, fn := range f {
+		if strings.HasSuffix(fn, "~") {
+			continue
+		}
+		if strings.Contains(fn, "/") {
+			continue
+		}
 		log.Printf("i %v fn %v\n", i, fn)
-		t, err := template.ParseFiles(path + "/" + fn)
+
+		fname := path + "/" + fn
+		t, err := template.New("new").Delims(`[%`, `%]`).Funcs(FuncMap).ParseFiles(fname)
 		if err != nil {
-			return tc, fmt.Errorf("Reading dir %s: %s", path, err)
+			return tc, fmt.Errorf("Reading file %s: %s", fname, err)
 		}
 		tc[fn] = t
 	}
