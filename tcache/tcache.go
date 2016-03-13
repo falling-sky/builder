@@ -3,6 +3,8 @@ package tcache
 import (
 	"fmt"
 	"log"
+	"sort"
+	"strings"
 	"text/template"
 
 	"github.com/falling-sky/builder/fileutil"
@@ -10,6 +12,32 @@ import (
 
 // Tcache contains a map of templates, key=filename (minus root directory name)
 type Tcache map[string]*template.Template
+
+// TopFiles returns the list of templates found at the top level of the
+// scanned directory.  The intention of this is that we can convert/expand
+// all top level files; and ignore anything below.
+// This will let us stop explicitly having to indicate every file name
+// in the builder; and let it be more dynamic.
+func (tc Tcache) TopFiles() []string {
+	ret := []string{}
+	for k := range tc {
+		if strings.Contains(k, "/") == false {
+			ret = append(ret, k)
+		}
+	}
+	sort.Strings(ret)
+	return ret
+}
+
+// Files returns all files found in the template root directory, including in subdirectories.
+func (tc Tcache) Files() []string {
+	ret := []string{}
+	for k := range tc {
+		ret = append(ret, k)
+	}
+	sort.Strings(ret)
+	return ret
+}
 
 // New returns a map of templates, key=filename (minus root directory name)
 func New(path string) (Tcache, error) {
@@ -27,5 +55,6 @@ func New(path string) (Tcache, error) {
 		}
 		tc[fn] = t
 	}
+
 	return tc, nil
 }

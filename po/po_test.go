@@ -5,7 +5,7 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	p, err := Load("../samples/dl/fr/falling-sky.fr_FR.po")
+	p, err := Load("../translations/dl/fr/falling-sky.fr_FR.po")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func TestLoad(t *testing.T) {
 }
 
 func TestLoadAll(t *testing.T) {
-	multi, err := LoadAll("../samples/falling-sky.pot", "../samples/dl")
+	multi, err := LoadAll("../translations/falling-sky.pot", "../translations/dl")
 	if err != nil {
 		t.Fatal(err)
 	}

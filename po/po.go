@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -31,6 +32,7 @@ type File struct {
 }
 type MapStringFile map[string]*File
 type Files struct {
+	Pot        *File
 	ByLanguage MapStringFile
 }
 
@@ -158,6 +160,16 @@ func Load(fn string) (*File, error) {
 	return f, nil
 }
 
+func (combined *Files) Languages() []string {
+	ret := []string{}
+
+	for k := range combined.ByLanguage {
+		ret = append(ret, k)
+	}
+	sort.Strings(ret)
+	return ret
+}
+
 // LoadAll loads a .pot file, and a directory of .po files.
 // The .pot file is mostly used for statistics.
 func LoadAll(potfn string, root string) (*Files, error) {
@@ -168,7 +180,7 @@ func LoadAll(potfn string, root string) (*Files, error) {
 	if err != nil {
 		return nil, err
 	}
-	combined.ByLanguage["pot"] = po
+	combined.Pot = po
 
 	ls, err := fileutil.FilesInDir(root)
 	if err != nil {
