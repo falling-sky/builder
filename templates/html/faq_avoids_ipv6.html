@@ -1,5 +1,6 @@
 [% PROCESS "inc/header.inc" %]
-[% PROCESS "list-nav.inc" page = "Avoiding IPv6?" %]
+[% $page := "Avoiding IPv6?" %]
+[% PROCESS "list-nav.inc" %]
 <div id="content">
   <h1 id="title">{{Your browser is avoiding IPv6.}}</h1>
 

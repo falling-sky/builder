@@ -1,5 +1,6 @@
 [% PROCESS "inc/header.inc" %]
-[% PROCESS "list-nav.inc" page = "Version" %]
+[% $page := "Version" %]
+[% PROCESS "list-nav.inc" %]
 
 <!-- You can create version.html.site 
      and this less-specific version file 
@@ -10,9 +11,9 @@
   <h1 id="title">version information</h1>
 
 <div id="version_information"><pre><code>
-URL: [% GET git_URL %]
-Revision: [% GET git_Revision %]
-Last Changed Date: [% GET git_Last_Changed_Date %]
+URL: [% .GitUrl %]
+Revision: [% .GitRevision %]
+Last Changed Date: [% .GitLastChangeDate %]
 </code></pre></div>
 </div>
 [% PROCESS "inc/footer.inc" %]

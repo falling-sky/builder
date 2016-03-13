@@ -1,5 +1,6 @@
 [% PROCESS "inc/header.inc" %]
-[% PROCESS "list-nav.inc" page = "stats" %]
+[% $page := "stats" %]
+[% PROCESS "list-nav.inc" %]
 
   <h1 id="title">{{<span lookup=site.name>site</span> statistics}}</h1>
 

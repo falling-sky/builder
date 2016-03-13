@@ -1,5 +1,6 @@
 [% PROCESS "inc/header.inc" %]
-[% PROCESS "list-nav.inc" page = "index" %]
+[% $page := "index" %]
+[% PROCESS "list-nav.inc" %]
 
 <h1 id="title" style="margin-bottom:0;">
   {{Test your IPv6 connectivity.}}

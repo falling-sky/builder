@@ -1,5 +1,6 @@
 [% PROCESS "inc/header.inc" %]
-[% PROCESS "list-nav.inc" page = "locale" %]
+[% $page := "locale" %]
+[% PROCESS "list-nav.inc" %]
 
 <div id="content">
 
@@ -20,13 +21,13 @@
   </thead>
   <tbody>
 
-[%  FOREACH name IN NAMES.keys.sort %]
+[% range $index, $element := .Names  %]
 <tr>
-<td><a href="/index.html.[% name %]"><code>[% name %]</code></a></td>
-<td><a href="/index.html.[% name %]">[% NAMES.$name %]</a></td>
-<td>[% TRANSLATED.$name %]%</td>
+<td><a href="/index.html.[% $index %]"><code>[% $index %]</code></a></td>
+<td><a href="/index.html.[% $index %]">[% $element %]</a></td>
+<td></td>
 </tr>
-[%  END %]
+[% end %]
 </body>
 </table>
 

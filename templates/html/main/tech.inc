@@ -170,7 +170,7 @@
         <td>
           <div id="detail_v6mtu">
             {{Validates that IPv6 requests with large packets work. If this test times out, but other IPv6 tests work, it suggests that there may be PMTUD issues; possibly involving IP tunnels.}}
-            [% 'Double check to make sure that ICMPv6 Type 2 ("Packet Too Big") messages are not filtered by your firewall.' | i18n %]
+            {{Double check to make sure that ICMPv6 Type 2 ("Packet Too Big") messages are not filtered by your firewall.}}
           </div>
         </td>
       </tr>
