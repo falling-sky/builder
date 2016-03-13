@@ -1,37 +1,39 @@
+[% $tabbed := 0 %]
+
 <div id="navcontainer">
 <ul id="navlist">
 
 <li><a href="/" 
-[% IF page == "index" %] id="current" [% SET tabbed = 1 %] [% END %]>{{Test IPv6}}</a></li>
+[% if eq $page "index" %] id="current" [% $tabbed := 1 %] [% end %]>{{Test IPv6}}</a></li>
 
 
 
 <li><a href="/faq.html" 
-[% IF page == "faq" %] id="current" [% SET tabbed = 1 %] [% END %]>{{FAQ}}</a></li>
+[% if eq $page "faq" %] id="current" [% $tabbed := 1 %] [% end %]>{{FAQ}}</a></li>
 
 
 
 <li><a href="/mirrors.html" 
-[% IF page == "mirrors" %] id="current" [% SET tabbed = 1 %] [% END %]>{{Mirrors}}</a></li>
+[% if eq $page "mirrors" %] id="current" [% $tabbed := 1 %] [% end %]>{{Mirrors}}</a></li>
 
 
 
 <!-- IF this is a page not normally in the banner, put it up this time anyways. -->
-[% UNLESS page == "stats" %]
-[% UNLESS page == "changes" %]
-[% UNLESS tabbed %]
-[% IF page %]
+[% if ne $page "stats" %]
+[% if ne $page "changes" %]
+[% if ne $tabbed 1 %]
+[% if ne $page "" %]
 <li><a href="#"
-id="current">[% GET page %]</a></li>
-[% END %]
-[% END %]
-[% END %]
-[% END %]
+id="current">[% $page %]</a></li>
+[% end %]
+[% end %]
+[% end %]
+[% end %]
 
 
 
   <li class=navright tabname=stats style="display:none"><a href="/stats.html" tabname=stats 
-  [% IF page == "stats" %] id="current" [% SET tabbed = 1 %] [% END %]>{{stats}}</a></li>
+  [% if eq $page "stats" %] id="current" [% $tabbed := 1 %] [% end %]>{{stats}}</a></li>
 
 
 

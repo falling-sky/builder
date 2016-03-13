@@ -1,6 +1,6 @@
 <hr/>
 <div id="about">
-<p>  Copyright (C) 2010, 2014 Jason Fesler. {{ All rights reserved. }}  Version [% .GitRevision %]<br/>
+<p>  Copyright (C) 2010, 2014 Jason Fesler. {{ All rights reserved. }}  Version [% .GitInfo.Version %]<br/>
 
  <a href="mirrors.html">{{ Mirrors }}</a> |
 <!-- <a href="mission.html">{{ Mission }}</a> | -->
@@ -19,9 +19,9 @@
 
 <a href="#" onclick="return help_page('locale.html','Locale')">
 <img src="/images/icon_987_red.png" height=20 border=0>
-[[% locale %]]
+[[% .Locale %]]
 </a>
-([% TRANSLATED.$locale %] %)
+<!-- ( TODO put percentage here -->
 
 <br/>
 [% PROCESS "inc/disclaimer.inc" %]

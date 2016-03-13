@@ -182,7 +182,7 @@ func LoadAll(potfn string, root string) (*Files, error) {
 	}
 	combined.Pot = po
 
-	ls, err := fileutil.FilesInDir(root)
+	ls, err := fileutil.FilesInDirRecursive(root)
 	if err != nil {
 		return nil, err
 	}

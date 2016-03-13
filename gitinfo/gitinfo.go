@@ -14,6 +14,7 @@ type GitInfo struct {
 	Version        string
 	Date           string
 	Repository     string
+	Hash           string
 }
 
 func GetGitInfo() *GitInfo {
@@ -23,6 +24,7 @@ func GetGitInfo() *GitInfo {
 	gi.Version = GitVersion()
 	gi.Date = GitDate()
 	gi.Repository = GitRepository()
+	gi.Hash = GitHash()
 	return gi
 }
 
@@ -35,6 +37,17 @@ func GitRevisionCount() string {
 	s := strings.TrimSpace(string(b))
 	lines := strings.Split(s, "\n")
 	return fmt.Sprintf("%v", len(lines))
+}
+
+func GitHash() string {
+	cmd := exec.Command("git", "log", "--oneline", "-1")
+	b, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatalf("running %#v %#v: %v", cmd.Path, cmd.Args, err)
+	}
+	parts := strings.Split(string(b), " ")
+	return parts[0]
+
 }
 
 func GitProjectVersion() string {

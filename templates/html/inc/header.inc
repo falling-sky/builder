@@ -1,22 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="[% GET lang %]" xml:lang="[% GET lang %]">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="[% .Lang %]" xml:lang="[% .Lang %]">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>{{Test your IPv6.}}</title>
-[% IF ( basename.match('index')) %]
+[% if eq .Basename "index" %]
   <meta name="description" content='{{This will test your browser and connection for IPv6 readiness, as well as show you your current IPV4 and IPv6 address.}}' />
-[% END %]
+[% end %]
   <meta name="keywords" content="test,ipv4,ipv6,isp" />
   <meta name="y_key" content="6a3ded130c3ff129" />
   <link rel="SHORTCUT ICON" href="http://test-ipv6.com/images/favicon.ico" />
-  <link rel="stylesheet" href="/index.css?version=[% GET version %]" type="text/css" />
+  <link rel="stylesheet" href="/index.css?version=[% .GitInfo.Version %]" type="text/css" />
   <link rel="apple-touch-icon" href="/images/knob_info.png"/> 
   <meta property="og:image" content="http://test-ipv6.com/images/snapshot.png" />
 
-   <script type="text/javascript"  src="/site/config.js?version=[% GET version %]"></script>
-   <script type="text/javascript"  src="/index.js.[% GET locale %]?version=[% GET version %]"></script>
+   <script type="text/javascript"  src="/site/config.js?version=[% .GitInfo.Version %]"></script>
+   <script type="text/javascript"  src="/index.js.[% .Locale %]?version=[% .GitInfo.Version %]"></script>
 
 <!--[if IE 6]>
 <script type="text/javascript">
