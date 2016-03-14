@@ -8,12 +8,12 @@ GIGO.messages = {
     "slow": "{{slow}}",
     "timeout": "{{timeout}}",
     
-    "No Direct IP": "{{Connections to urls with IP addresses appear to be blocked; perhaps by a web filter such as \'NoScript\' or \'RequestPolicy\' installed into your browser, or filtering in your proxy server.  This limits some of the functionality of this test site.}}",
+    "No Direct IP": "{{Connections to urls with IP addresses appear to be blocked; perhaps by a web filter such as 'NoScript' or 'RequestPolicy' installed into your browser, or filtering in your proxy server.  This limits some of the functionality of this test site.}}",
     "No Direct IPv4": "{{IPv4 Connections using DNS work; but literal IP addresses in urls do not.  These are rarely used on the web today.}}",
     "No Direct IPv6": "{{IPv6 Connections using DNS work; but literal IP addresses in urls do not. These are rarely used on the web today.}}",
     "6to4": "{{You appear to be using a public 6to4 gateway; your router may be providing this to you automatically.  Such public gateways have no service level agreements; you may see performance problems using such.  Better would be to get a native IPv6 address from your ISP.}}",
     "teredo": "{{Your IPv6 connection appears to be using Teredo, a type of IPv4/IPv6 translation using a public gateway.  The quality for this <i>may</i> suffer, as you are using a public gateway to reach IPv6 based sites.}}",
-    "teredo-minimum": "{{Your IPv6 connection appears to be using Teredo, a type of IPv4/IPv6 gateway; currently it connects only to direct IP\'s.  Your browser will not be able to go to IPv6 sites by name.  This means the current configuration is not useful for browsing IPv6 web sites.}}",
+    "teredo-minimum": "{{Your IPv6 connection appears to be using Teredo, a type of IPv4/IPv6 gateway; currently it connects only to direct IP's.  Your browser will not be able to go to IPv6 sites by name.  This means the current configuration is not useful for browsing IPv6 web sites.}}",
     "teredo-v4pref": "{{Your IPv6 connection appears to be using Teredo, a type of IPv4/IPv6 gateway.  Your particular teredo configuration is only used as a protocol of last resort. When visiting a site with both IPv4 and IPv6, IPv4 will be preferred.}}",
     "IPv6 MTU": "{{Danger! IPv6 sorta works - however, large packets appear to fail, giving the appearance of a broken website.  If a publisher publishes to IPv6, you will believe their web site to be broken. Ask your ISP about MTU issues; possibly with your tunnel.}} {{Check your firewall to make sure that ICMPv6 messages are allowed (in particular, Type 2 or Packet Too Big).}}",
     "confused:ASK": "{{Test results inconclusive; they were not consistent with expectations.  Please rerun the test, and if the results are the same, please fill out the contact form.}}",
@@ -25,7 +25,7 @@ GIGO.messages = {
     "ipv4_only:ds_slow": "{{When a publisher offers both IPv4 and IPv6, your browser appears to slow down signficantly compared to an IPv4-only site. You may even believe the destination web site to be broken. This may be due to your IPv6 configuration.}}",
     "ipv4_only:ds_timeout": "{{When a publisher offers both IPv4 and IPv6, your browser will time out trying to connect. You may believe the site is down. This may be due to your IPv6 configuration.  Consider disabling IPv6, or seeking help.}}",
     "ipv4_slow": "{{Connections to IPv4 are slow, but functional.  Perhaps you or your ISP put you behind an IP sharing device (NAT) that is currently slow.}}",
-    "ipv6_only": "{{You appear to be able to browse the IPv6 Internet only.  You have no access to IPv4.  That\'s pretty bold!}}",
+    "ipv6_only": "{{You appear to be able to browse the IPv6 Internet only.  You have no access to IPv4.  That's pretty bold!}}",
     "ipv6_slow": "{{Connections to IPv6 are slow, but functional.   Perhaps you are using a public IPv6 tunnel that is either slow, or not located near you.}}",
     "ipv6_timeout": "{{Connections to IPv6-only sites are timing out.  Any web site that is IPv6 only, will appear to be down to you.}}",
     "broken_ipv6": "{{Connections to IPv6-capable web sites hang.  It appears that you may have IPv6 configured; and your computer believes that your IPv6 is working, with a route.  It is however completely failing.  Any web site that adds IPv6, will become unreachable to you.  If you are unable to fix your IPv6 routing or connectivity, seek help.  If all else fails, strongly consider disabling IP6 on host.}}",
@@ -38,8 +38,8 @@ GIGO.messages = {
     "v6ns:bad": "{{Your DNS server (possibly run by your ISP) appears to have no access to the IPv6 Internet, or is not configured to use it.  This may in the future restrict your ability to reach IPv6-only sites.}}",
     "ip_timeout:firefox": "{{You are likely using a FireFox plugin that is causing IP based tests to fail.  Examples: RequestPolicy.  Please disable those while using this site.}}",
     "confused:obbo": "{{A lookup for an IPv6-only name failed; yet the lookup and connect for dual-stack connected via IPv6.  Something appears to be confused with the DNS lookups.}}",
-    "apple:dnsbug_aaaa": "{{A lookup for an IPv6-only name failed; yet the lookup and connect for dual-stack connected via IPv6.   The IPv6-only lookup should have worked.  Apple has a bug that sporadically causes some IPv6 lookups to fail.  We saw evidence of it on this test. You can reload the page and try the test again.  For more details, see <a href=\'http://openradar.appspot.com/7333104\'>http://openradar.appspot.com/7333104</a>.}}",
-    "apple:dnsbug_ds": "{{A lookup for an dual-stack IPv4 and IPv6 name failed (at minimum it should have connected via IPv4).  Apple has a bug that sporadically causes some IPv6 lookups to fail.  We saw evidence of it on this test. You can reload the page and try the test again.  For more details, see <a href=\'http://openradar.appspot.com/7333104\'>http://openradar.appspot.com/7333104</a>.}}",
+    "apple:dnsbug_aaaa": "{{A lookup for an IPv6-only name failed; yet the lookup and connect for dual-stack connected via IPv6.   The IPv6-only lookup should have worked.  Apple has a bug that sporadically causes some IPv6 lookups to fail.  We saw evidence of it on this test. You can reload the page and try the test again.  For more details, see <a href='http://openradar.appspot.com/7333104'>http://openradar.appspot.com/7333104</a>.}}",
+    "apple:dnsbug_ds": "{{A lookup for an dual-stack IPv4 and IPv6 name failed (at minimum it should have connected via IPv4).  Apple has a bug that sporadically causes some IPv6 lookups to fail.  We saw evidence of it on this test. You can reload the page and try the test again.  For more details, see <a href='http://openradar.appspot.com/7333104'>http://openradar.appspot.com/7333104</a>.}}",
     "ipv4:no_address": "{{No IPv4 address detected}}",
     "ipv6:no_address": "{{No IPv6 address detected}}",
     "no_address": "{{Your IP address(es) could not be detected due to inteference from browser add-ons.}}",
@@ -51,12 +51,12 @@ GIGO.messages = {
     "buggydns1": "{{We looked up an IPv6 address, but your DNS server (possibly your home router) mangled the response, and is treating it as (broken) IPv4.}}",
     "tunnel_dumb": "{{It appears that you use a tunnel mechanism for either IPv4 or IPv6.}}",
     "tunnel_6rd_dumb": "{{It appears that you use a managed tunnel mechanism, 6RD, to transport IPv6 over IPv4.}}",
-    "proxy_via": "{{We have detected that you are using a proxy.  This means we are testing your proxy server, not your computer. Proxy details (as reported by your proxy \'Via\' header): %details}}",
+    "proxy_via": "{{We have detected that you are using a proxy.  This means we are testing your proxy server, not your computer. Proxy details (as reported by your proxy 'Via' header): %details}}",
     "proxy_via_dumb": "{{We have detected that you are using a proxy.  This means we are testing your proxy server, not your computer.}}",
-    "ipv6:nodns": "{{IPv6 connections work, but connections using DNS names do not use IPv6.  For some reason, your browser or your OS is not doing IPv6 DNS \'AAAA\' lookups.}}",
+    "ipv6:nodns": "{{IPv6 connections work, but connections using DNS names do not use IPv6.  For some reason, your browser or your OS is not doing IPv6 DNS 'AAAA' lookups.}}",
     "broken": "{{We have suggestions to help you fix your system.}}",
     "sites": "{{Since you have IPv6, we are including a tab that shows how well you can reach other IPv6 sites.  %sites}}",
-    "avoids_ipv6": "{{Your browser has real working IPv6 address - but is avoiding using it.  We\'re concerned about this.}}"
+    "avoids_ipv6": "{{Your browser has real working IPv6 address - but is avoiding using it.  We're concerned about this.}}"
 };
 
 GIGO.messages_popups = {

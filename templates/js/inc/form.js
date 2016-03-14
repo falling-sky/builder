@@ -117,7 +117,7 @@ GIGO.validate_form = function (thisform) {
     if ((thisform.contact.value === null) || (thisform.contact.value === "")) {
         if (!GIGO.validate_form.asked) {
             GIGO.validate_form.asked = 1;
-            alert("{{Note: I can\'t contact you, if the contact info is blank.  If you really want to submit this anonymously, hit Send Results again.}}");
+            alert("{{Note: I can't contact you, if the contact info is blank.  If you really want to submit this anonymously, hit Send Results again.}}");
             thisform.contact.focus();
             return false;
         }
