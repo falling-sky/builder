@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/falling-sky/builder/config"
 	"github.com/falling-sky/builder/fileutil"
 	"github.com/falling-sky/builder/gitinfo"
 	"github.com/falling-sky/builder/po"
@@ -24,13 +25,13 @@ var reTRANSLATE = regexp.MustCompile(`(?ms){{(.*?)}}`)
 // This is so we can generate the work list up front; and then pace out the work
 // based on number of avaialble CPUs.
 type QueueItem struct {
+	Config       *config.Record
 	Filename     string
 	PoFile       *po.File
 	PostProcess  func(string, string) error
-	InputDir     string
-	OutputDir    string
 	Data         *TemplateData
 	EscapeQuotes bool
+	MultiLocale  bool
 }
 
 // QueueTracker is an object for managing QueueItem jobs.
@@ -67,10 +68,10 @@ func init() {
 // GrabContent grabs a file.  Takes into account the QueueItem variables
 // such as the iput directory path.  The file is cached for future requests.
 func GrabContent(qi *QueueItem) string {
-	topName := qi.InputDir + "/" + qi.Filename
+	topName := qi.Config.Directories.TemplateDir + "/" + qi.Filename
 
 	grab := func(fn string) string {
-		fullname := qi.InputDir + "/" + fn
+		fullname := qi.Config.Directories.TemplateDir + "/" + fn
 		c, err := fileutil.ReadFile(fullname)
 		if err != err {
 			log.Fatalf("tried to load %s (via %s): %s", fullname, topName, err)
@@ -102,7 +103,7 @@ func GrabContent(qi *QueueItem) string {
 // are fewer than translations. And we prefer to do translations
 // without the template ugliness.
 func ProcessTemplate(qi *QueueItem, content string) string {
-	topName := qi.InputDir + "/" + qi.Filename
+	topName := qi.Config.Directories.TemplateDir + "/" + qi.Filename
 
 	// Do we need any custom functions?
 	FuncMap := make(template.FuncMap)
@@ -168,8 +169,8 @@ func RunJob(qi *QueueItem) {
 		}
 	}()
 	log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
-	readFilename := qi.InputDir + "/" + qi.Filename
-	writeFilename := qi.OutputDir + "/" + qi.Filename
+	readFilename := qi.Config.Directories.TemplateDir + "/" + qi.Filename
+	writeFilename := qi.Config.Directories.OutputDir + "/" + qi.Filename
 	_ = writeFilename
 
 	var content string
@@ -189,7 +190,10 @@ func RunJob(qi *QueueItem) {
 
 	content = TranslateContent(qi, content)
 
-	outname := qi.OutputDir + "/" + qi.Filename + "." + qi.PoFile.Language
+	outname := qi.Config.Directories.OutputDir + "/" + qi.Filename + "." + qi.PoFile.Language
+	if qi.MultiLocale == false {
+		outname = qi.Config.Directories.OutputDir + "/" + qi.Filename
+	}
 	err := ioutil.WriteFile(outname, []byte(content), 0755)
 	if err != nil {
 		log.Fatal(err)
@@ -234,6 +238,9 @@ func StartQueue() *QueueTracker {
 	qt := &QueueTracker{}
 	qt.Channel = make(chan *QueueItem, 1000)
 	qt.WG = &sync.WaitGroup{}
+	go qt.RunQueue()
+	go qt.RunQueue()
+	go qt.RunQueue()
 	go qt.RunQueue()
 
 	return qt
