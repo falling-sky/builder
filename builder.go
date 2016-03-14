@@ -12,7 +12,6 @@ import (
 	"github.com/falling-sky/builder/gitinfo"
 	"github.com/falling-sky/builder/job"
 	"github.com/falling-sky/builder/po"
-	"github.com/falling-sky/builder/postprocess"
 )
 
 var configFileName = flag.String("config", "", "config file location (see --example)")
@@ -20,16 +19,10 @@ var configHelp = flag.Bool("example", false, "Dump a configuration example to th
 
 type postType struct {
 	extension   string
-	postprocess func(string, string) error
+	postprocess string
 	escapequote bool
 	multilocale bool
-}
-
-var postTable = []postType{
-	{"html", postprocess.HTML, false, true},
-	{"css", postprocess.CSS, false, true},
-	{"js", postprocess.JS, true, true},
-	{"php", postprocess.CSS, false, false},
+	compress    bool
 }
 
 func main() {
@@ -42,6 +35,13 @@ func main() {
 	conf, err := config.Load(*configFileName)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	var postTable = []postType{
+		{"html", conf.Processors.HTML, false, true, true},
+		{"css", conf.Processors.CSS, false, true, true},
+		{"js", conf.Processors.JS, true, true, true},
+		{"php", conf.Processors.CSS, false, false, false},
 	}
 
 	// Start the job queue for templates
