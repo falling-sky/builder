@@ -68,9 +68,11 @@ func main() {
 					p = strings.Split(file, ".")
 					td.Basename = p[0]
 
-					if locale != "de_DE" {
-						continue
-					}
+					/*
+						if locale != "de_DE" {
+							continue
+						}
+					*/
 
 					job := &job.QueueItem{
 						Filename:     file,

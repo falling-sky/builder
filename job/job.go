@@ -129,7 +129,7 @@ func TranslateContent(qi *QueueItem, content string) string {
 		//	log.Printf("grabbing %v\n", insideName)
 		newContent := qi.PoFile.Translate(insideName, qi.EscapeQuotes)
 
-		log.Printf("Replacing %s with %s\n", wrapperString, newContent)
+		//	log.Printf("Replacing %s with %s\n", wrapperString, newContent)
 
 		content = strings.Replace(content, wrapperString, newContent, -1)
 

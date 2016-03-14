@@ -250,20 +250,23 @@ func (f *File) Translate(input string, escapequotes bool) string {
 		return f.GetLocale()
 	}
 
-	if strings.Contains(input, "You will need to do this") {
-		fmt.Printf("Wanted:\n")
-		fmt.Printf("%s\n", input)
+	/*
+	   // Testing a specific translation to see why it is mismatched from the old tools
+	   	if strings.Contains(input, "You will need to do this") {
+	   		fmt.Printf("Wanted:\n")
+	   		fmt.Printf("%s\n", input)
 
-		for k, v := range f.ByID {
-			if strings.Contains(k, "You will need to do this") {
-				fmt.Printf("Have:\n")
-				fmt.Printf("%s\n", k)
-				fmt.Printf("%#v\n", v)
-			}
-		}
+	   		for k, v := range f.ByID {
+	   			if strings.Contains(k, "You will need to do this") {
+	   				fmt.Printf("Have:\n")
+	   				fmt.Printf("%s\n", k)
+	   				fmt.Printf("%#v\n", v)
+	   			}
+	   		}
 
-		_ = "breakpoint"
-	}
+	   		_ = "breakpoint"
+	   	}
+	*/
 
 	newtext := input
 
