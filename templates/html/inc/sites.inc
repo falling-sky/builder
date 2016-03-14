@@ -12,7 +12,7 @@ URLs are being used. }}
 
   <div class="answer">
     <p>{{ <b>Hint</b>:  Columns are sortable (click the first row); 
-    <a href=\"#\" onclick=\"GIGO.test_sites(2); return false;\">click here</a>
+    <a href="#" onclick="GIGO.test_sites(2); return false;">click here</a>
     to re-check reachability from where you are to those mirrors. }}
     </p>
   </div>
@@ -34,7 +34,7 @@ URLs are being used. }}
 
   <div class="answer">
     {{Full mirrors are welcomed and appreciated, whether public or private.
-    Please see <a href=\"https://github.com/falling-sky/source/wiki\">the wiki</a> for details. }}
+    Please see <a href="https://github.com/falling-sky/source/wiki">the wiki</a> for details. }}
   </div>
 
   

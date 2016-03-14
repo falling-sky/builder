@@ -29,7 +29,7 @@
 <td>
 {{ If green, you will have no problem on World IPv6 day. }}<br/>
 {{ If this fails, seek help from your IT department, helpdesk, or ISP tech support. }}<br/>
-{{ If this fails, consider using the <a href=\"/\">full test</a>,
+{{ If this fails, consider using the <a href="/">full test</a>,
 with IE, Firefox, Safari, or Chrome, to get more detailed information about possible failure reasons.
  }}
 </td></tr>

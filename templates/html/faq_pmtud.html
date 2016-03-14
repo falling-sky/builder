@@ -14,7 +14,7 @@
   </div>
 
   <div class="answer">
-    <p>{{PMTUD is a mechanism used on the Internet that tells your computer the maximum size of the packets that should be sent for a given destination. How this works: Your host will send a possibly large packet; with the packet marked \"Do Not Fragment\". When the packet reaches a router that can't forward this packet, due to size, it sends back a response saying \"Too big! Try this size instead.\"}}</p>
+    <p>{{PMTUD is a mechanism used on the Internet that tells your computer the maximum size of the packets that should be sent for a given destination. How this works: Your host will send a possibly large packet; with the packet marked "Do Not Fragment". When the packet reaches a router that can't forward this packet, due to size, it sends back a response saying "Too big! Try this size instead."}}</p>
   </div>
 
   <div class="question">
@@ -22,7 +22,7 @@
   </div>
 
   <div class="answer">
-    <p>{{With IPv6, all packets are by definition \"Do Not Fragment\". The responsibility of sending the correct sized packets no longer falls on the router; this is an expensive operation for the router to handle. Instead, the ability to do PMTUD is mandated by the IPv6 specification.}}</p>
+    <p>{{With IPv6, all packets are by definition "Do Not Fragment". The responsibility of sending the correct sized packets no longer falls on the router; this is an expensive operation for the router to handle. Instead, the ability to do PMTUD is mandated by the IPv6 specification.}}</p>
   </div>
 
   <div class="question">
@@ -44,7 +44,7 @@
     
     <p><img src="/images/faq_pmtud_6in4.png" alt="6in4 diagram"/></p>
     
-    <p>{{Your router will automatically add an IPv4 header to the top of your packet. This same router will let your computer know if the packet is going to be too big; your computer will (as long as it gets the ICMPv6 \"Packet Too Big\" message) resend the packet, at a smaller size recommended by your router. A router near the web site, will automatically remove the IPv4 header, and forward the IPv6 peice.}}</p>
+    <p>{{Your router will automatically add an IPv4 header to the top of your packet. This same router will let your computer know if the packet is going to be too big; your computer will (as long as it gets the ICMPv6 "Packet Too Big" message) resend the packet, at a smaller size recommended by your router. A router near the web site, will automatically remove the IPv4 header, and forward the IPv6 peice.}}</p>
     
     <p>{{This is like putting a letter in an envelope, inside another envelope for someone else to forward on.  There may be a maximum size or weight limit for your postage stamp.  Tunneling is conceptually the same.}}</p>
     
@@ -52,7 +52,7 @@
     <p>{{If any Internet service provider along the way adds their own tunnel, in effect stuffing your package into another envelope, the packet may become too big:}}</p>
     
     <p><img src="/images/faq_pmtud_6in4in4.png" alt="6in4in4 diagram"/></p>
-    <p>{{In the above case, the message is now so big, that it can't be forwarded.  A \"Packet Too Big\" message will be sent by that router - but it only sees the IPv4 address; not your IPv6 address.  Because of this, your computer will never retry with a smaller sized packet, one that might fit when using multiple envelopes.}}</p>
+    <p>{{In the above case, the message is now so big, that it can't be forwarded.  A "Packet Too Big" message will be sent by that router - but it only sees the IPv4 address; not your IPv6 address.  Because of this, your computer will never retry with a smaller sized packet, one that might fit when using multiple envelopes.}}</p>
     
   </div>
 
@@ -113,7 +113,7 @@ badamount-lm:~ jfesler$
     </p>
     
     
-    <p>{{ If you have \"native\" IPv6, meaning your ISP gave you your IPv6 connectivity, and you are still running into MTU problems, see if your router can advertise a smaller IPv6 MTU. Alternately, configure your <b>entire LAN</b> for a smaller MTU (not really advised!) }}</p>
+    <p>{{ If you have "native" IPv6, meaning your ISP gave you your IPv6 connectivity, and you are still running into MTU problems, see if your router can advertise a smaller IPv6 MTU. Alternately, configure your <b>entire LAN</b> for a smaller MTU (not really advised!) }}</p>
     
     <p>{{If your router provides IPv6 for you, see if you can configure a smaller MTU to be advertising with (perhaps) RADVD.}}</p>
     
@@ -121,15 +121,15 @@ badamount-lm:~ jfesler$
     <ul>
       <li>{{Apple Airport routers: Automatically send ICMPv6 redirects to your hosts, telling them to reduce the path MTU to 1280.}}</li>
 
-      <li>{{DD-WRT routers: Looks like you need to use \"AdvLinkMTU 1280;\" on your wireless side; and make sure the tun6to4 mtu is set to 1280.}}</li>
+      <li>{{DD-WRT routers: Looks like you need to use "AdvLinkMTU 1280;" on your wireless side; and make sure the tun6to4 mtu is set to 1280.}}</li>
 
-      <li>{{Routers based on Linux, BSD, and (presumably) Mac: Set your 6to4 interface to MTU 1280. Configure radvd.conf's interface config with \"AdvLinkMTU 1280\".}}</li>
+      <li>{{Routers based on Linux, BSD, and (presumably) Mac: Set your 6to4 interface to MTU 1280. Configure radvd.conf's interface config with "AdvLinkMTU 1280".}}</li>
     </ul>
 
-    <p>{{If you run \"6to4\" on your computer instead (not the router):}}</p>
+    <p>{{If you run "6to4" on your computer instead (not the router):}}</p>
 
     <ul>
-      <li>{{Linux, BSD, and (presumably) Mac: Set your 6to4 interface to MTU 1280. If you are running radvd, set \"AdvLinkMTU 1280\" in your interface radvd.conf .}}</li>
+      <li>{{Linux, BSD, and (presumably) Mac: Set your 6to4 interface to MTU 1280. If you are running radvd, set "AdvLinkMTU 1280" in your interface radvd.conf .}}</li>
 
       <li>{{Windows: If you figure this out, please share with jfesler@test-ipv6.com to add to this site. Presumably: control panel, network adapters, properties, 6}}</li>
     </ul>

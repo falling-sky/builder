@@ -9,13 +9,13 @@
     <ul>
       <li>{{Make sure your router has a public IPv4 address. Without this, 6to4 fails.}}</li>
 
-      <li>{{ If your router permits you to log in, use \"ping\" or \"ping6\" and see if you can ping \"ipv6.test-ipv6.com\". Don't waste your time fixing computers until the router works! }}</li>
+      <li>{{ If your router permits you to log in, use "ping" or "ping6" and see if you can ping "ipv6.test-ipv6.com". Don't waste your time fixing computers until the router works! }}</li>
     </ul>
 
-  <li>{{ If you are using your Linux, BSD, Mac, or Windows box to \"talk 6to4\" specifically: }}</li>
+  <li>{{ If you are using your Linux, BSD, Mac, or Windows box to "talk 6to4" specifically: }}</li>
 
     <ul>
-      <li>{{ Make sure your router is passing \"protocol 41\" to you. }}</li>
+      <li>{{ Make sure your router is passing "protocol 41" to you. }}</li>
 
       <li>{{ Most home systems have private IPv4 addresses; this won't work with 6to4 (unless..) }}</li>
 
@@ -31,7 +31,7 @@
   <li style="list-style: none; display: inline">
     <ul>
       <li>{{ Ask your ISP if they offer any IPv6 connectivity (including possibly 6in4 tunnels, or tunnelbroker type tunnels). }}</li>
-      <li>{{ See <a href=\"#\" onclick='return help_page(\"faq_6to4.html\",\"6to4\")'>6to4</a> for more information on why you would want to switch; and some options. }}</li>
+      <li>{{ See <a href="#" onclick='return help_page("faq_6to4.html","6to4")'>6to4</a> for more information on why you would want to switch; and some options. }}</li>
     </ul>
   </li>
 </ul>

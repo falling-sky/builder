@@ -267,7 +267,7 @@
 
         <td>
           <div id="detail_buggydns1">
-            {{Queries for a malformed AAAA record. Some routers mishandle these as \"A\" records, and only keep the first 32 bits.  We want this test to fail to connect.}}
+            {{Queries for a malformed AAAA record. Some routers mishandle these as "A" records, and only keep the first 32 bits.  We want this test to fail to connect.}}
           </div>
         </td>
       </tr>

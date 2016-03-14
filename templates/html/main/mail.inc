@@ -14,7 +14,7 @@
     </div>
     
     <div id="comments_faq" style="display:none">
-      <p>{{<span id=\"comments_faq_link\"></span> (FAQ) page is available for <b>your</b> exact set of results.  Please read it  before leaving comments; many questions have already been answered.  If you still have questions, comments, or concerns, feel freel to use this form.}}</p>
+      <p>{{<span id="comments_faq_link"></span> (FAQ) page is available for <b>your</b> exact set of results.  Please read it  before leaving comments; many questions have already been answered.  If you still have questions, comments, or concerns, feel freel to use this form.}}</p>
     </div>
     
    [% PROCESS "main/mail-language.inc" %]
@@ -124,7 +124,7 @@
               </div>
 
               <div id="help_windows" style="display:none">
-                {{If you are technically minded, please open a \"Command Prompt\" or \"cmd\" window, and run these three commands:}}
+                {{If you are technically minded, please open a "Command Prompt" or "cmd" window, and run these three commands:}}
 		<br/>
                 <code>  ipconfig /all</code><br/>
                 <code>  netsh interface ipv6 show teredo</code><br/>

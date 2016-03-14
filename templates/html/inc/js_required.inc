@@ -8,10 +8,10 @@
   <p id="score1">{{ Do you use NoScript? }}</p>
   <p>
    {{ If you use this Firefox add-on, you'll need to
-  \"Temporarily allow all this page\".   You will need to do this <b>twice</b> for everything to work.
+  "Temporarily allow all this page".   You will need to do this <b>twice</b> for everything to work.
   Alternately, disable NoScript entirely until you are done with this site. }}</p>
 
-  <p>{{ You can opt instead to view the <a href=\"simple_test.html\">simple test</a>, which
+  <p>{{ You can opt instead to view the <a href="simple_test.html">simple test</a>, which
   will give you a quick pass/fail for IPv4, IPv4+IPv6, and IPv6.  It will however offer
   little diagnostic information. }}</p>
 </div>

@@ -6,8 +6,8 @@
   <p>
 {{
   <b>To disable IPv6 entirely, until your ISP offers IPv6 to you:</b> see <b>Microsoft's 
-  \"fixit\" site</b> that gives clear instructions. We advocate considering 
-  \"Use IPv4 instead of IPv6 in prefix policies\", instead of completely 
+  "fixit" site</b> that gives clear instructions. We advocate considering 
+  "Use IPv4 instead of IPv6 in prefix policies", instead of completely 
   disabling IPv6. Specific Windows features depend on IPv6 being enabled. 
 }}
 </p>
@@ -25,19 +25,19 @@
 
     <li>{{ Go to the control panel }}</li>
 
-    <li>{{ Go to \"Network and Internet\" }}</li>
+    <li>{{ Go to "Network and Internet" }}</li>
 
-    <li>{{ Go to \"View network status and tasks\" }}</li>
+    <li>{{ Go to "View network status and tasks" }}</li>
 
-    <li>{{ Go to \"Change adapter settings\". }}</li>
+    <li>{{ Go to "Change adapter settings". }}</li>
 
     <li>{{ Go to your main Internet connection, double click }}</li>
 
-    <li>{{ Go to \"Properties\" }}</li>
+    <li>{{ Go to "Properties" }}</li>
 
-    <li>{{ Uncheck \"Internet Protocol Version 6\" }}</li>
+    <li>{{ Uncheck "Internet Protocol Version 6" }}</li>
 
-    <li>{{ Hit \"ok\" }}</li>
+    <li>{{ Hit "ok" }}</li>
 
     <li>{{ Shutdown/reboot. }}</li>
   </ul>
@@ -59,7 +59,7 @@
 <div class="os_osx">
   <p><b>{{ OS X users }}</b></p>
   
-  <p>{{ Before disabling IPv6, please be sure you are running the latest OS version.  In particular, OS X 10.6.7 has several workarounds for being \"Broken\".  This may solve your problems without resorting to completely disabling IPv6. }}</p>
+  <p>{{ Before disabling IPv6, please be sure you are running the latest OS version.  In particular, OS X 10.6.7 has several workarounds for being "Broken".  This may solve your problems without resorting to completely disabling IPv6. }}</p>
 
 
 
@@ -68,7 +68,7 @@
 
     <li style="list-style: none; display: inline">
       <ul>
-        <li>{{ Go to the \"Apple\" menu (top left corner) }}</li>
+        <li>{{ Go to the "Apple" menu (top left corner) }}</li>
 
         <li>{{ Go to System Preferences }}</li>
 
@@ -76,7 +76,7 @@
 
         <li>{{ Click on your primary network (green icon) if you have more than one work. }}</li>
 
-        <li>{{ Go to \"Advanced\" }}</li>
+        <li>{{ Go to "Advanced" }}</li>
 
         <li>{{ Disable IPv6 }}</li>
 

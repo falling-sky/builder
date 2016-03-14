@@ -1,6 +1,6 @@
    <p> 
 
-{{ Consider trying the \"netalyzr\".  This is another site that runs a
+{{ Consider trying the "netalyzr".  This is another site that runs a
 java applet (which can do more than my site can, in just javascript).
 I would find feedback about how you useful this site was for you. }}
 {{ From the netalyzr staff: }}

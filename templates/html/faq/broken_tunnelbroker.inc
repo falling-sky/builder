@@ -14,16 +14,16 @@
     </ul>
   </li>
 
-  <li>{{ If you are using your Linux, BSD, Mac, or Windows box to \"talk 6to4\" specifically: }}
+  <li>{{ If you are using your Linux, BSD, Mac, or Windows box to "talk 6to4" specifically: }}
 
     <ul>
-      <li>{{ Make sure your router is passing \"protocol 41\" to you. }}</li>
+      <li>{{ Make sure your router is passing "protocol 41" to you. }}</li>
 
-      <li>{{ Make sure any software firewall you are operating is passing \"protocol 41\" to you. }}</li>
+      <li>{{ Make sure any software firewall you are operating is passing "protocol 41" to you. }}</li>
 
       <li>{{ If everything worked before your reboot but fails now, check your firewall settings. }}</li>
 
-      <li>{{ Make sure the box \"doing 6to4\" can ping the other side of the tunnelbroker gateway before working on any other hosts. }}</li>
+      <li>{{ Make sure the box "doing 6to4" can ping the other side of the tunnelbroker gateway before working on any other hosts. }}</li>
     </ul>
   </li>
 </ul>

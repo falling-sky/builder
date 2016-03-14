@@ -5,7 +5,7 @@
 <p>
 {{ When looking for your IPv6 address, skip any <code>fe80:</code> address. 
 Everyone has them if their OS supports IPv6; this is regadless of whether or
-not your ISP supports IPv6 yet.  Those are \"link local\" addresses; used just
+not your ISP supports IPv6 yet.  Those are "link local" addresses; used just
 for communicating to other hosts in the same physical network as you.
  }}</p>
 
@@ -13,12 +13,12 @@ for communicating to other hosts in the same physical network as you.
 
   <p>{{ OS X users: To find your IP address using the GUI: }}</p>
   <ul>
-  <li>{{ Go to the \"Apple\" menu (top left corner) }}</li>
+  <li>{{ Go to the "Apple" menu (top left corner) }}</li>
   <li>{{ Go to System Preferences }}</li>
   <li>{{ Go to Network }}</li>
   <li>{{ Click on your primary network (green icon) if you have more than one work. }}</li>
-  <li>{{ Go to \"Advanced\" }}</li>
-  <li>{{ Look at the TCP/IP tab, uder \"Configure IPv6\". }}</li>
+  <li>{{ Go to "Advanced" }}</li>
+  <li>{{ Look at the TCP/IP tab, uder "Configure IPv6". }}</li>
   <li>{{ Make a note of whether or not there is a router. }}</li>
   <li>{{ Make a note of the IPv6 address (if any). }}</li>
   </ul>
@@ -29,12 +29,12 @@ for communicating to other hosts in the same physical network as you.
   <li>{{ To see your IP addresses: <code>ifconfig -f inet6</code>. }}</li>
   <li>{{ Ignore the <code>fe80:</code> addresses; look for any other address on your <code>en0</code> or <code>en1</code>. }}</li>
   <li>{{ To see if you have a default route: <code>netstat -nr -f inet6</code>. }}</li>
-  <li>{{ Look for a line that says \"default\"; probably pointing to a gateway starting with <code>fe80:</code> }}</li>
+  <li>{{ Look for a line that says "default"; probably pointing to a gateway starting with <code>fe80:</code> }}</li>
   </ul>
 </div>
 
 <div class="os_ios">
-  <p>{{ iPhone and iPad users: No information is shown via Apple's preferences/setup.  The \"IT Tools\" and the \"ip6config\" apps do show IPv6 address data; both cost. }}</p>
+  <p>{{ iPhone and iPad users: No information is shown via Apple's preferences/setup.  The "IT Tools" and the "ip6config" apps do show IPv6 address data; both cost. }}</p>
 </div>
 
 
@@ -66,8 +66,8 @@ for communicating to other hosts in the same physical network as you.
 
   <p>{{ Windows users: To find your IP address using cmd.exe: }}</p>
   <ul>
-  <li>{{ Go to your \"start\" menu }}</li>
-  <li>{{ If you have a \"Run\" menu option, select it.  Otherwise go to the \"Search programs and files\" box. }}</li>
+  <li>{{ Go to your "start" menu }}</li>
+  <li>{{ If you have a "Run" menu option, select it.  Otherwise go to the "Search programs and files" box. }}</li>
   <li>{{ Type <code>cmd.exe</code> }}</li>
   <li>{{ In the cmd window, type <code>ipconfig</code> . }}</li>
   </ul>
@@ -76,12 +76,12 @@ for communicating to other hosts in the same physical network as you.
   <ul>
   <li>{{ Go to the start menu }}</li>
   <li>{{ Go to the control panel }}</li>
-  <li>{{ Go to \"Network and Internet\" }}</li>
-  <li>{{ Go to \"View network status and tasks\" }}</li>
-  <li>{{ Go to \"Change adapter settings\". }}</li>
+  <li>{{ Go to "Network and Internet" }}</li>
+  <li>{{ Go to "View network status and tasks" }}</li>
+  <li>{{ Go to "Change adapter settings". }}</li>
   <li>{{ Go to your main Internet connection, double click }}</li>
-  <li>{{ Go to \"Details\" }}</li>
-  <li>{{ Look for \"IPv6 Address\" and \"IPv6 Default Gateway\" }}</li>
+  <li>{{ Go to "Details" }}</li>
+  <li>{{ Look for "IPv6 Address" and "IPv6 Default Gateway" }}</li>
   </ul>
 
   <p><em>{{ Other Windows based OS's: Send jfesler@test-ipv6.com detailed instructions; and I'll add them to the site. }}</em></p>
