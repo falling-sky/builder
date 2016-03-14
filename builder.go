@@ -19,7 +19,7 @@ var configHelp = flag.Bool("example", false, "Dump a configuration example to th
 
 type postType struct {
 	extension   string
-	postprocess string
+	postprocess []string
 	escapequote bool
 	multilocale bool
 	compress    bool
@@ -88,6 +88,7 @@ func main() {
 				EscapeQuotes: tt.escapequote,
 				Data:         td,
 				MultiLocale:  tt.multilocale,
+				PostProcess:  tt.postprocess,
 			}
 			jobTracker.Add(job)
 

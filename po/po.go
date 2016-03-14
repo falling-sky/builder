@@ -291,6 +291,10 @@ func (f *File) Translate(input string, escapequotes bool) string {
 		}
 	}
 
+	if escapequotes {
+		newtext = strings.Replace(newtext, `"`, `\"`, -1)
+		newtext = strings.Replace(newtext, `'`, `\'`, -1)
+	}
 	// TODO escapequotes
 	// Perl does this:
 	//         $text =~ s/(?<![\\])"/\\"/g;

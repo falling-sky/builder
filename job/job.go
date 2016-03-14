@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"os/exec"
 	"regexp"
 	"strings"
 	"sync"
@@ -29,7 +30,7 @@ type QueueItem struct {
 	RootDir      string
 	Filename     string
 	PoFile       *po.File
-	PostProcess  func(string, string) error
+	PostProcess  []string
 	Data         *TemplateData
 	EscapeQuotes bool
 	MultiLocale  bool
@@ -156,6 +157,77 @@ func TranslateContent(qi *QueueItem, content string) string {
 	return content
 }
 
+func ProcessContent(qi *QueueItem, content string) {
+
+	tasks := qi.PostProcess
+
+	// Prepare the macros that we support for running external commands.
+	macros := make(map[string]string)
+	macros["NAME"] = qi.Filename
+	macros["NAMEGZ"] = macros["NAME"] + ".gz"
+	if qi.MultiLocale == true {
+		macros["NAME"] = macros["NAME"] + "." + qi.PoFile.Language
+		macros["NAMEGZ"] = macros["NAMEGZ"] + "." + qi.PoFile.Language
+	}
+	macros["INPUT"] = macros["NAME"] + ".orig"
+	macros["OUTPUT"] = macros["NAME"]
+
+	// Supported varables are:
+	// INPUT                  - same as [FILENAME].orig - the file written by builder before calling 3rd party fancy tools
+	// FILENAME or OUTPUT     - Final output filename (with path)
+	// FILENAMEGZ or OUTPUTGZ - Final output filename, gzipped (with path)
+	// BASENAME               - Final output name (no path). Use this if inserting text into files.
+	// BASENAMEGZ             - Final output name, gzipped (no path).  Use this if inserting text into files.
+
+	fixup := func(s string) string {
+		for k, v := range macros {
+			kk := "[" + k + "]"
+			s = strings.Replace(s, kk, v, -1)
+		}
+		return s
+	}
+
+	// First, write the file to disk.
+	outputfilename := qi.Config.Directories.OutputDir + "/" + macros["INPUT"]
+
+	err := ioutil.WriteFile(outputfilename, []byte(content), 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// log.Printf("wrote %s etc (%v bytes)\n", outputfilename, len(content))
+
+	// Post processing defined from the config file, 3rd party tools
+	for _, task := range tasks {
+		runcmd := fixup(task)
+		// log.Printf("running: %s\n", runcmd)
+
+		shellscript := bytes.NewBufferString(runcmd)
+		stderr := &bytes.Buffer{}
+
+		c := exec.Cmd{}
+		c.Path = "/bin/sh"
+		c.Dir = qi.Config.Directories.OutputDir
+		c.Stdin = shellscript
+		c.Stderr = stderr
+		// log.Printf("About to run: %#v\n", runcmd)
+		e := c.Run()
+
+		// HACK HACK HACK ignore tidy exit code 1
+		if e != nil {
+			if strings.HasPrefix(runcmd, "tidy ") {
+				if e.Error() == "exit status 1" {
+					e = nil
+				}
+			}
+		}
+		if e != nil {
+			log.Printf("stderr: %s\n", stderr.String())
+			log.Fatalf("While running %#v .. got: %#v\n", runcmd, e.Error())
+		}
+	}
+
+}
+
 // RunJob takes a single QueueItem, and expands, translates, optimizes,
 // and writes files for that single file for a single language.  These are spoon-fed
 // by RunQueue.
@@ -165,7 +237,7 @@ func RunJob(qi *QueueItem) {
 		t1 := time.Now()
 		dur := t1.Sub(t0)
 		ms := int64(dur / time.Millisecond)
-		if ms > 2 {
+		if ms > 100 {
 			log.Printf("Spent %v ms\n", ms)
 		}
 	}()
@@ -190,20 +262,7 @@ func RunJob(qi *QueueItem) {
 	// TODO process translations
 
 	content = TranslateContent(qi, content)
-
-	outname := qi.Config.Directories.OutputDir + "/" + qi.Filename + "." + qi.PoFile.Language
-	if qi.MultiLocale == false {
-		outname = qi.Config.Directories.OutputDir + "/" + qi.Filename
-	}
-	err := ioutil.WriteFile(outname, []byte(content), 0755)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("wrote %s etc (%v bytes)\n", outname, len(content))
-
-	//	ioutil.WriteFile(writeFilename, []byte(content), 0755)
-	//
-	// This is where the dreams are made.  Or the nightmares.
+	ProcessContent(qi, content)
 
 }
 
@@ -237,10 +296,8 @@ func (qt *QueueTracker) Wait() {
 // a handle to be used for adding and waiting on jobs.
 func StartQueue() *QueueTracker {
 	qt := &QueueTracker{}
-	qt.Channel = make(chan *QueueItem, 1000)
+	qt.Channel = make(chan *QueueItem, 1)
 	qt.WG = &sync.WaitGroup{}
-	go qt.RunQueue()
-	go qt.RunQueue()
 	go qt.RunQueue()
 	go qt.RunQueue()
 
