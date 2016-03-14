@@ -27,6 +27,7 @@ type postType struct {
 
 func main() {
 	flag.Parse()
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	if *configHelp {
 		fmt.Println(config.Example())
@@ -58,7 +59,7 @@ func main() {
 	cachedGitInfo := gitinfo.GetGitInfo()
 
 	for _, tt := range postTable {
-		inputDir := conf.Directories.PoDir + "/" + tt.extension
+		inputDir := conf.Directories.TemplateDir + "/" + tt.extension
 		files, err := fileutil.FilesInDirNotRecursive(inputDir)
 		if err != nil {
 			log.Fatal(err)
@@ -70,25 +71,18 @@ func main() {
 
 			// Build up what we need to know about the project, that
 			// the templates will ask about.
-			td := &job.TemplateData{}
-			td.GitInfo = cachedGitInfo
-			td.PoMap = languages.ByLanguage
-			td.Locale = locale
-			p := strings.Split(td.Locale, "_")
-			td.Lang = p[0]
-			td.LangUC = strings.ToUpper(td.Lang)
-
-			p = strings.Split(file, ".")
-			td.Basename = p[0]
-
-			/*
-				if locale != "de_DE" {
-					continue
-				}
-			*/
+			td := &job.TemplateData{
+				GitInfo:  cachedGitInfo,
+				PoMap:    languages.ByLanguage,
+				Locale:   pofile.GetLocale(),
+				Lang:     pofile.GetLang(),
+				LangUC:   pofile.GetLangUC(),
+				Basename: strings.Split(file, ".")[0],
+			}
 
 			job := &job.QueueItem{
 				Config:       conf,
+				RootDir:      conf.Directories.TemplateDir + "/" + tt.extension,
 				Filename:     file,
 				PoFile:       pofile,
 				EscapeQuotes: tt.escapequote,

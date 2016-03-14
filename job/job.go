@@ -26,6 +26,7 @@ var reTRANSLATE = regexp.MustCompile(`(?ms){{(.*?)}}`)
 // based on number of avaialble CPUs.
 type QueueItem struct {
 	Config       *config.Record
+	RootDir      string
 	Filename     string
 	PoFile       *po.File
 	PostProcess  func(string, string) error
@@ -68,15 +69,15 @@ func init() {
 // GrabContent grabs a file.  Takes into account the QueueItem variables
 // such as the iput directory path.  The file is cached for future requests.
 func GrabContent(qi *QueueItem) string {
-	topName := qi.Config.Directories.TemplateDir + "/" + qi.Filename
+	topName := qi.RootDir + "/" + qi.Filename
 
 	grab := func(fn string) string {
-		fullname := qi.Config.Directories.TemplateDir + "/" + fn
+		fullname := qi.RootDir + "/" + fn
 		c, err := fileutil.ReadFile(fullname)
-		if err != err {
+		if err != nil {
 			log.Fatalf("tried to load %s (via %s): %s", fullname, topName, err)
 		}
-		// log.Printf("read %v (%v bytes)\n", fullname, len(c))
+		//		log.Printf("read %v (%v bytes)\n", fullname, len(c))
 		return c
 	}
 
@@ -103,7 +104,7 @@ func GrabContent(qi *QueueItem) string {
 // are fewer than translations. And we prefer to do translations
 // without the template ugliness.
 func ProcessTemplate(qi *QueueItem, content string) string {
-	topName := qi.Config.Directories.TemplateDir + "/" + qi.Filename
+	topName := qi.RootDir + "/" + qi.Filename
 
 	// Do we need any custom functions?
 	FuncMap := make(template.FuncMap)
@@ -169,7 +170,7 @@ func RunJob(qi *QueueItem) {
 		}
 	}()
 	log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
-	readFilename := qi.Config.Directories.TemplateDir + "/" + qi.Filename
+	readFilename := qi.RootDir + "/" + qi.Filename
 	writeFilename := qi.Config.Directories.OutputDir + "/" + qi.Filename
 	_ = writeFilename
 

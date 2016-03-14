@@ -1,6 +1,6 @@
 <div class="tabbox_outside">
-
-  [% PROCESS "main/tabnav.inc" page = "index" %]
+[% $page := "index" %]
+[% PROCESS "main/tabnav.inc" %]
 
   <div class="tabbox_middle">
     <div class="tabbox_inside" id="tabbox_inside">
