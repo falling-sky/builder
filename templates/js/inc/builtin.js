@@ -548,7 +548,7 @@ GIGO.help_popup = function (file, tabname, popup) {
         // avoid cross-domain problems.
         hostname = String(document.location.hostname);
         file = "http://" + hostname + "/" + file;
-        lfile = file + '.[% locale %]';
+        lfile = file + '.{{locale}}';
 
 
         jQuery(handle).html("{{loading...}}"); // Loading indicator.    

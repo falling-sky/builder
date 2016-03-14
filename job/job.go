@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+	"time"
 
 	"github.com/falling-sky/builder/fileutil"
 	"github.com/falling-sky/builder/gitinfo"
@@ -17,14 +18,16 @@ import (
 // rePROCESS matches on   [% PROCESS "filename" %]
 // and captures the entire template directivel as well as the inside filename.
 var rePROCESS = regexp.MustCompile(`\[\%\s*PROCESS\s*"(.*?)"\s*\%\]`)
+var reTRANSLATE = regexp.MustCompile(`(?ms){{(.*?)}}`)
 
 type QueueItem struct {
-	Filename    string
-	PoFile      *po.File
-	PostProcess func(string, string) error
-	InputDir    string
-	OutputDir   string
-	Data        *TemplateData
+	Filename     string
+	PoFile       *po.File
+	PostProcess  func(string, string) error
+	InputDir     string
+	OutputDir    string
+	Data         *TemplateData
+	EscapeQuotes bool
 }
 
 type QueueTracker struct {
@@ -41,6 +44,17 @@ type TemplateData struct {
 	Basename string
 }
 
+type ParsedCacheType struct {
+	lock   sync.RWMutex
+	byname map[string]string
+}
+
+var ParsedCache ParsedCacheType
+
+func init() {
+	ParsedCache.byname = make(map[string]string)
+}
+
 func GrabContent(qi *QueueItem) string {
 	topName := qi.InputDir + "/" + qi.Filename
 
@@ -50,7 +64,7 @@ func GrabContent(qi *QueueItem) string {
 		if err != err {
 			log.Fatalf("tried to load %s (via %s): %s", fullname, topName, err)
 		}
-		log.Printf("read %v (%v bytes)\n", fullname, len(c))
+		// log.Printf("read %v (%v bytes)\n", fullname, len(c))
 		return c
 	}
 
@@ -66,7 +80,6 @@ func GrabContent(qi *QueueItem) string {
 		}
 		wrapperString := matches[0]
 		insideName := matches[1]
-		log.Printf("grabbing %v\n", insideName)
 		newContent := grab(insideName)
 		content = strings.Replace(content, wrapperString, newContent, -1)
 	}
@@ -100,18 +113,71 @@ func ProcessTemplate(qi *QueueItem, content string) string {
 	return string(wr.Bytes())
 }
 
-func RunJob(qi *QueueItem) {
-	log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
+func TranslateContent(qi *QueueItem, content string) string {
+	for {
 
+		matches := reTRANSLATE.FindStringSubmatch(content)
+		if len(matches) == 0 {
+			break
+		}
+		if len(matches) < 2 {
+			log.Fatalf("I don't know what happened, but %s is interesting", matches[0])
+		}
+		wrapperString := matches[0]
+		insideName := matches[1]
+
+		//	log.Printf("grabbing %v\n", insideName)
+		newContent := qi.PoFile.Translate(insideName, qi.EscapeQuotes)
+
+		log.Printf("Replacing %s with %s\n", wrapperString, newContent)
+
+		content = strings.Replace(content, wrapperString, newContent, -1)
+
+	}
+	return content
+}
+
+func RunJob(qi *QueueItem) {
+	t0 := time.Now()
+	defer func() {
+		t1 := time.Now()
+		dur := t1.Sub(t0)
+		ms := int64(dur / time.Millisecond)
+		if ms > 2 {
+			log.Printf("Spent %v ms\n", ms)
+		}
+	}()
+	log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
+	readFilename := qi.InputDir + "/" + qi.Filename
 	writeFilename := qi.OutputDir + "/" + qi.Filename
 	_ = writeFilename
 
-	content := GrabContent(qi)
-	content = ProcessTemplate(qi, content)
+	var content string
+	ParsedCache.lock.Lock()
+	if c, ok := ParsedCache.byname[readFilename]; ok {
+		// log.Printf("cached: %s", readFilename)
+		content = c
+	} else {
+		// log.Printf("not cached: %s", readFilename)
+		content = GrabContent(qi)
+		content = ProcessTemplate(qi, content)
+		ParsedCache.byname[readFilename] = content
+	}
+	ParsedCache.lock.Unlock()
+
 	// TODO process translations
 
-	ioutil.WriteFile(writeFilename, []byte(content), 0755)
-	log.Printf("wrote %s etc (%v bytes)\n", writeFilename, len(content))
+	content = TranslateContent(qi, content)
+
+	outname := qi.OutputDir + "/" + qi.Filename + "." + qi.PoFile.Language
+	err := ioutil.WriteFile(outname, []byte(content), 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("wrote %s etc (%v bytes)\n", outname, len(content))
+
+	//	ioutil.WriteFile(writeFilename, []byte(content), 0755)
+	//
 	// This is where the dreams are made.  Or the nightmares.
 
 }
@@ -145,8 +211,9 @@ func (qt *QueueTracker) Close() {
 
 func StartQueue() *QueueTracker {
 	qt := &QueueTracker{}
-	qt.Channel = make(chan *QueueItem, 10)
+	qt.Channel = make(chan *QueueItem, 1000)
 	qt.WG = &sync.WaitGroup{}
 	go qt.RunQueue()
+
 	return qt
 }

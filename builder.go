@@ -19,12 +19,13 @@ var outputDir = flag.String("outputdir", "output", "Location to place output int
 type postType struct {
 	extension   string
 	postprocess func(string, string) error
+	escapequote bool
 }
 
 var postTable = []postType{
-	{"html", postprocess.PostProcessHTML},
-	{"css", postprocess.PostProcessCSS},
-	{"js", postprocess.PostProcessJS},
+	{"html", postprocess.PostProcessHTML, false},
+	{"css", postprocess.PostProcessCSS, false},
+	{"js", postprocess.PostProcessJS, true},
 }
 
 func main() {
@@ -38,6 +39,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Grab this just once.
+	cachedGitInfo := gitinfo.GetGitInfo()
 
 	for _, tt := range postTable {
 		inputDir := *templateDir + "/" + tt.extension
@@ -54,7 +58,7 @@ func main() {
 					// Build up what we need to know about the project, that
 					// the templates will ask about.
 					td := &job.TemplateData{}
-					td.GitInfo = gitinfo.GetGitInfo()
+					td.GitInfo = cachedGitInfo
 					td.PoMap = languages.ByLanguage
 					td.Locale = locale
 					p := strings.Split(td.Locale, "_")
@@ -64,12 +68,17 @@ func main() {
 					p = strings.Split(file, ".")
 					td.Basename = p[0]
 
+					if locale != "de_DE" {
+						continue
+					}
+
 					job := &job.QueueItem{
-						Filename:  file,
-						PoFile:    pofile,
-						InputDir:  inputDir,
-						OutputDir: *outputDir,
-						Data:      td,
+						Filename:     file,
+						PoFile:       pofile,
+						InputDir:     inputDir,
+						OutputDir:    *outputDir,
+						EscapeQuotes: tt.escapequote,
+						Data:         td,
 					}
 					jobTracker.Add(job)
 				}

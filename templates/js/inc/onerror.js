@@ -15,8 +15,8 @@ window.onerror = function(message, url, linenumber) {
         eurl = eurl + "message=" + encodeURIComponent(message);
         eurl = eurl + "&url=" + encodeURIComponent(url);
         eurl = eurl + "&linenumber=" + encodeURIComponent(linenumber);
-        eurl = eurl + "&lang=" + encodeURIComponent("[% GET langUC %]");
-        eurl = eurl + "&version=" + encodeURIComponent("[% GET version %]");
+        eurl = eurl + "&lang=" + encodeURIComponent("{{langUC}}");
+        eurl = eurl + "&version=" + encodeURIComponent("[% .GitInfo.Version %]");
         new Image().src = eurl;
     }
     return false;

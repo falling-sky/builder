@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -45,6 +46,8 @@ msgstr ""
 msgid "Q: So, why worry? NAT will work, right? I use NAT at home today after all.."
 msgstr ""
 `
+
+var reWHITESPACE = regexp.MustCompile(`\s+`)
 
 func unquote(s string) (string, error) {
 	if len(s) == 0 {
@@ -213,4 +216,68 @@ func LoadAll(potfn string, root string) (*Files, error) {
 	}
 
 	return combined, nil
+}
+
+func (f *File) GetLocale() string {
+	s := f.Language
+	return s
+}
+func (f *File) GetLang() string {
+	s := f.Language
+	p := strings.Split(s, "_")
+	return p[0]
+}
+func (f *File) GetLangUC() string {
+	s := f.Language
+	p := strings.Split(s, "_")
+	return strings.ToUpper(p[0])
+}
+
+func (f *File) Translate(input string, escapequotes bool) string {
+
+	// Canonicalize.
+	// Remove redundant, leading, and trailing whitespace.
+	input = strings.TrimSpace(input)
+	input = reWHITESPACE.ReplaceAllString(input, " ")
+
+	if input == "lang" {
+		return f.GetLang()
+	}
+	if input == "langUC" {
+		return f.GetLangUC()
+	}
+	if input == "locale" {
+		return f.GetLocale()
+	}
+
+	if strings.Contains(input, "You will need to do this") {
+		fmt.Printf("Wanted:\n")
+		fmt.Printf("%s\n", input)
+
+		for k, v := range f.ByID {
+			if strings.Contains(k, "You will need to do this") {
+				fmt.Printf("Have:\n")
+				fmt.Printf("%s\n", k)
+				fmt.Printf("%#v\n", v)
+			}
+		}
+
+		_ = "breakpoint"
+	}
+
+	newtext := input
+
+	if found, ok := f.ByID[input]; ok {
+		c := found.MsgStr
+		if c != "" {
+			newtext = c
+		}
+	}
+
+	// TODO escapequotes
+	// Perl does this:
+	//         $text =~ s/(?<![\\])"/\\"/g;
+	//    $text =~ s/(?<![\\])'/\\'/g;
+	// GO does not do look-behind assertions
+	return newtext
 }
