@@ -6,6 +6,7 @@ import (
 	"log"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 	"text/template"
@@ -199,7 +200,7 @@ func ProcessContent(qi *QueueItem, content string) {
 	// Post processing defined from the config file, 3rd party tools
 	for _, task := range tasks {
 		runcmd := fixup(task)
-		// log.Printf("running: %s\n", runcmd)
+		//log.Printf("running: %s\n", runcmd)
 
 		shellscript := bytes.NewBufferString(runcmd)
 		stderr := &bytes.Buffer{}
@@ -238,13 +239,11 @@ func RunJob(qi *QueueItem) {
 		dur := t1.Sub(t0)
 		ms := int64(dur / time.Millisecond)
 		if ms > 100 {
-			log.Printf("Spent %v ms\n", ms)
+			log.Printf("Spent %v ms on %s %s\n", ms, qi.Filename, qi.PoFile.Language)
 		}
 	}()
-	log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
+	// log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
 	readFilename := qi.RootDir + "/" + qi.Filename
-	writeFilename := qi.Config.Directories.OutputDir + "/" + qi.Filename
-	_ = writeFilename
 
 	var content string
 	ParsedCache.lock.Lock()
@@ -296,10 +295,14 @@ func (qt *QueueTracker) Wait() {
 // a handle to be used for adding and waiting on jobs.
 func StartQueue() *QueueTracker {
 	qt := &QueueTracker{}
-	qt.Channel = make(chan *QueueItem, 1)
+	qt.Channel = make(chan *QueueItem, 10000)
 	qt.WG = &sync.WaitGroup{}
-	go qt.RunQueue()
-	go qt.RunQueue()
+
+	maxjobs := runtime.NumCPU()
+	//maxjobs=1
+	for i := 0; i < maxjobs; i++ {
+		go qt.RunQueue()
+	}
 
 	return qt
 }

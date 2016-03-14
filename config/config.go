@@ -50,20 +50,19 @@ func (r *Record) Defaults() {
 	if len(r.Processors.JS) == 0 {
 		r.Processors.JS = []string{
 			`uglifyjs2  [NAME].orig -o [NAME] -c --warnings=false   --source-map [NAME].map   --stats`,
-			`cat [NAME] | gzip -f -9 -Sgz  > [NAMEGZ]`,
+			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.CSS) == 0 {
 		r.Processors.CSS = []string{
 			`cssmin < [NAME].orig > [NAME]`,
-			`cat [NAME] | gzip -f -9 -Sgz  > [NAMEGZ]`,
+			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.HTML) == 0 {
 		r.Processors.HTML = []string{
 			`tidy -quiet -indent -asxhtml -utf8 -w 120 --show-warnings false < [NAME].orig > [NAME]`,
-			`test -s [NAME] && echo tidy looks like it output`,
-			`cat [NAME] | sed 's#/index.js#/index.js.gz#' | gzip -f -9 -Sgz  > [NAMEGZ]`,
+			`sed < [DONE] 's#/index.js#/index.js.gz#' | gzip -f -9 -Sgz  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.PHP) == 0 {

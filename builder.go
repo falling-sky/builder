@@ -42,7 +42,7 @@ func main() {
 		{"html", conf.Processors.HTML, false, true, true},
 		{"css", conf.Processors.CSS, false, true, true},
 		{"js", conf.Processors.JS, true, true, true},
-		{"php", conf.Processors.CSS, false, false, false},
+		{"php", conf.Processors.PHP, false, false, false},
 	}
 
 	// Start the job queue for templates
