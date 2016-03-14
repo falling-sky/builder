@@ -5,35 +5,37 @@ import (
 	"sync"
 )
 
-type ReadFileCacheItem struct {
+type readFileCacheItem struct {
 	s string
 	e error
 }
-type ReadFileCacheType struct {
+type readFileCacheType struct {
 	lock   sync.RWMutex
-	byname map[string]ReadFileCacheItem
+	byname map[string]readFileCacheItem
 }
 
-var ReadFileCache ReadFileCacheType
+var readFileCache readFileCacheType
 
 func init() {
-	ReadFileCache.byname = make(map[string]ReadFileCacheItem)
+	readFileCache.byname = make(map[string]readFileCacheItem)
 }
 
-func ReadFileFromDisk(fn string) (string, error) {
+// ReadFileNoCache Read a file from disk, return as a string.
+func ReadFileNoCache(fn string) (string, error) {
 	b, e := ioutil.ReadFile(fn)
 	return string(b), e
 }
 
-func ReadFileWithCache(fn string) (string, error) {
-	ReadFileCache.lock.Lock()
-	defer ReadFileCache.lock.Unlock()
-	if item, ok := ReadFileCache.byname[fn]; ok {
+// ReadFile will check the cache first, then fallback to ReadFileFromDisk
+func ReadFile(fn string) (string, error) {
+	readFileCache.lock.Lock()
+	defer readFileCache.lock.Unlock()
+	if item, ok := readFileCache.byname[fn]; ok {
 		return item.s, item.e
 	}
 
 	// Crap. Go read it for real.
-	s, e := ReadFileFromDisk(fn)
-	ReadFileCache.byname[fn] = ReadFileCacheItem{s: s, e: e}
+	s, e := ReadFileNoCache(fn)
+	readFileCache.byname[fn] = readFileCacheItem{s: s, e: e}
 	return s, e
 }

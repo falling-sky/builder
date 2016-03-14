@@ -7,10 +7,9 @@ import (
 	"strings"
 )
 
-// Get list of files below a directory.
-// Returns filenames only.
-// Strips the root directory name form the filename.
-// Recursively visits all files below this level.
+// FilesInDirRecursive returns a list of all files below
+// this root directory.  The root directory name is removed
+// from the files; the returned names are relative to the root.
 func FilesInDirRecursive(root string) ([]string, error) {
 	found := []string{}
 
@@ -48,7 +47,10 @@ func FilesInDirRecursive(root string) ([]string, error) {
 
 }
 
-// Get list of files below a directory, without recursion
+// FilesInDirNotRecursive returns a list of all files in
+// this root directory; but not in subdirectories.
+// The root directory name is removed
+// from the files; the returned names are relative to the root.
 func FilesInDirNotRecursive(root string) ([]string, error) {
 	found := []string{}
 

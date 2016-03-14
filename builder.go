@@ -23,9 +23,9 @@ type postType struct {
 }
 
 var postTable = []postType{
-	{"html", postprocess.PostProcessHTML, false},
-	{"css", postprocess.PostProcessCSS, false},
-	{"js", postprocess.PostProcessJS, true},
+	{"html", postprocess.HTML, false},
+	{"css", postprocess.CSS, false},
+	{"js", postprocess.JS, true},
 }
 
 func main() {

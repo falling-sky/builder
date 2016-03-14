@@ -20,6 +20,9 @@ import (
 var rePROCESS = regexp.MustCompile(`\[\%\s*PROCESS\s*"(.*?)"\s*\%\]`)
 var reTRANSLATE = regexp.MustCompile(`(?ms){{(.*?)}}`)
 
+// QueueItem represents a single job to be queued, and ran as capacity allows.
+// This is so we can generate the work list up front; and then pace out the work
+// based on number of avaialble CPUs.
 type QueueItem struct {
 	Filename     string
 	PoFile       *po.File
@@ -30,11 +33,14 @@ type QueueItem struct {
 	EscapeQuotes bool
 }
 
+// QueueTracker is an object for managing QueueItem jobs.
 type QueueTracker struct {
 	Channel chan *QueueItem
 	WG      *sync.WaitGroup
 }
 
+// TemplateData is passed when adding the job to the queue.
+// This is used by Go's text/template to extract info before expansion.
 type TemplateData struct {
 	GitInfo  *gitinfo.GitInfo
 	PoMap    po.MapStringFile
@@ -44,23 +50,28 @@ type TemplateData struct {
 	Basename string
 }
 
+// ParsedCacheType provides properly mutex locked cache access to
+// the expanded (but untranslated) templates.
 type ParsedCacheType struct {
 	lock   sync.RWMutex
 	byname map[string]string
 }
 
+// ParsedCache holds the actual cache of expanded (but not translated) templates.
 var ParsedCache ParsedCacheType
 
 func init() {
 	ParsedCache.byname = make(map[string]string)
 }
 
+// GrabContent grabs a file.  Takes into account the QueueItem variables
+// such as the iput directory path.  The file is cached for future requests.
 func GrabContent(qi *QueueItem) string {
 	topName := qi.InputDir + "/" + qi.Filename
 
 	grab := func(fn string) string {
 		fullname := qi.InputDir + "/" + fn
-		c, err := fileutil.ReadFileWithCache(fullname)
+		c, err := fileutil.ReadFile(fullname)
 		if err != err {
 			log.Fatalf("tried to load %s (via %s): %s", fullname, topName, err)
 		}
@@ -86,6 +97,10 @@ func GrabContent(qi *QueueItem) string {
 	return content
 }
 
+// ProcessTemplate runs text.Template against the given text.
+// Note we use [% %]  for text.Template directorives, since these
+// are fewer than translations. And we prefer to do translations
+// without the template ugliness.
 func ProcessTemplate(qi *QueueItem, content string) string {
 	topName := qi.InputDir + "/" + qi.Filename
 
@@ -113,6 +128,8 @@ func ProcessTemplate(qi *QueueItem, content string) string {
 	return string(wr.Bytes())
 }
 
+// TranslateContent  looks for {{ text }} and replaces it with
+// either translated text, or the original text.
 func TranslateContent(qi *QueueItem, content string) string {
 	for {
 
@@ -137,6 +154,9 @@ func TranslateContent(qi *QueueItem, content string) string {
 	return content
 }
 
+// RunJob takes a single QueueItem, and expands, translates, optimizes,
+// and writes files for that single file for a single language.  These are spoon-fed
+// by RunQueue.
 func RunJob(qi *QueueItem) {
 	t0 := time.Now()
 	defer func() {
@@ -182,33 +202,34 @@ func RunJob(qi *QueueItem) {
 
 }
 
+// RunQueue is a goroutine that listens to a channel for jobs.
+// If jobs are accepted, they are given to RunJob.
 func (qt *QueueTracker) RunQueue() {
 	for {
 		job, ok := <-qt.Channel
 		if ok {
-			RunJob(job)
-			qt.WG.Done()
+			RunJob(job)  // Run the job.
+			qt.WG.Done() // Decrement WaitGroup counter
 		} else {
 			return
 		}
 	}
 }
 
+// Add a job to the queue.  Sends it to the channel.
 func (qt *QueueTracker) Add(qi *QueueItem) {
-	qt.WG.Add(1)
-	qt.Channel <- qi
+	qt.WG.Add(1)     // Increment the WaitGroup counter.
+	qt.Channel <- qi // Put the job in the queue.
 }
 
+// Wait will wait for all existing jobs to finish.
 func (qt *QueueTracker) Wait() {
 	log.Printf("WAITING\n")
 	qt.WG.Wait()
 }
 
-func (qt *QueueTracker) Close() {
-	close(qt.Channel)
-	qt.Wait()
-}
-
+// StartQueue will start a goroutine for jobs, and return
+// a handle to be used for adding and waiting on jobs.
 func StartQueue() *QueueTracker {
 	qt := &QueueTracker{}
 	qt.Channel = make(chan *QueueItem, 1000)

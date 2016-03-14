@@ -3,7 +3,7 @@ package fileutil
 import "testing"
 
 func TestFilesInDir(t *testing.T) {
-	found, err := FilesInDir("../templates/html")
+	found, err := FilesInDirRecursive("../templates/html")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -11,7 +11,7 @@ func TestFilesInDir(t *testing.T) {
 }
 
 func FilesInDirBadDir(t *testing.T) {
-	if _, err := FilesInDir("baddir"); err == nil {
+	if _, err := FilesInDirRecursive("baddir"); err == nil {
 		t.Fatal("failed to detect bad directory name")
 	}
 }

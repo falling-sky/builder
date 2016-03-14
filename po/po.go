@@ -21,6 +21,8 @@ type Record struct {
 
 // MapStringRecord maps original strings to Records
 type MapStringRecord map[string]*Record
+
+// MapHeaders contains a list of headers from the "" element (first element).
 type MapHeaders map[string]string
 
 // File contains the map of strings for this translation.
@@ -31,7 +33,11 @@ type File struct {
 	Translated int
 	OutOf      int
 }
+
+// MapStringFile is a map of loaded translation files
 type MapStringFile map[string]*File
+
+// Files a collection of loaded translation files, plus the .pot file
 type Files struct {
 	Pot        *File
 	ByLanguage MapStringFile
@@ -163,6 +169,7 @@ func Load(fn string) (*File, error) {
 	return f, nil
 }
 
+// Languages returns the list of locales loaded in the combined *Files object
 func (combined *Files) Languages() []string {
 	ret := []string{}
 
@@ -218,21 +225,28 @@ func LoadAll(potfn string, root string) (*Files, error) {
 	return combined, nil
 }
 
+// GetLocale simply returns the locale name; ie en_US or pt_BR
 func (f *File) GetLocale() string {
 	s := f.Language
 	return s
 }
+
+// GetLang returns the lowercase name string; ie en or pt
 func (f *File) GetLang() string {
 	s := f.Language
 	p := strings.Split(s, "_")
 	return p[0]
 }
+
+// GetLangUC  returns the uppercase name string; ie EN or PT
 func (f *File) GetLangUC() string {
 	s := f.Language
 	p := strings.Split(s, "_")
 	return strings.ToUpper(p[0])
 }
 
+// Translate takes a given input text, and returns back
+// either the translated text, or the original text again.
 func (f *File) Translate(input string, escapequotes bool) string {
 
 	// Canonicalize.
