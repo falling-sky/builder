@@ -5,7 +5,28 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 )
+
+func PoQuote(w *bytes.Buffer, label string, content string) {
+	w.WriteString(label)
+	w.WriteString(" ")
+
+	if strings.Contains(content, "\n") {
+		w.WriteString(strconv.Quote(""))
+		w.WriteString("\n")
+		lines := strings.SplitAfter(content, "\n")
+		for _, line := range lines {
+			if len(line) > 0 {
+				w.WriteString(strconv.Quote(line))
+				w.WriteString("\n")
+			}
+		}
+	} else {
+		w.WriteString(strconv.Quote(content))
+		w.WriteString("\n")
+	}
+}
 
 // Load a .PO file into memory.
 func (f *File) Save(fn string) error {
@@ -18,7 +39,8 @@ Last-Translator: Unspecified Translator <jfesler+unspecified-translator@test-ipv
 Language-Team: LANGUAGE <v6code@test-ipv6.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit`,
+Content-Transfer-Encoding: 8bit
+`,
 	}
 
 	// Start new output buffer
@@ -30,10 +52,10 @@ Content-Transfer-Encoding: 8bit`,
 	for _, str := range f.InOrder {
 		r := f.ByID[str]
 		if r.Comment != "" {
-			b.WriteString("#: " + strconv.Quote(r.Comment) + "\n")
+			PoQuote(b, "#:", r.Comment)
 		}
-		b.WriteString("msgid " + strconv.Quote(r.MsgID) + "\n")
-		b.WriteString("msgstr" + strconv.Quote(r.MsgStr) + "\n")
+		PoQuote(b, "msgid", r.MsgID)
+		PoQuote(b, "msgstr", r.MsgStr)
 		b.WriteString("\n")
 	}
 	err := ioutil.WriteFile(fn, b.Bytes(), 0644)
