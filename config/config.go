@@ -41,7 +41,7 @@ func (r *Record) Defaults() {
 			"[NAME] will simply be index.html.en_US, index.js.en_US, or comment.php",
 			"[NAMEGZ] will simply be index.html.gz.en_US, index.js.gz.en_US, or comment.php.gz",
 			"For convenience:",
-			"[INPUT] will be identical to [NAME].orig",
+			"[INPUT] will be identical to [NAME].orig - and is written to disk at the start of the commands.",
 			"[OUTPUT] will be idetnical to [NAME]",
 			"All processors must be defined.  At minimum simply use mv [NAME].orig NAME",
 		}
@@ -49,27 +49,27 @@ func (r *Record) Defaults() {
 
 	if len(r.Processors.JS) == 0 {
 		r.Processors.JS = []string{
-//			`uglifyjs2  [NAME].orig -o [NAME] -c --warnings=false   --source-map [NAME].map   --stats`,
-			`mv [NAME].orig [NAME]`,
-			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
+		//			`uglifyjs2  [NAME].orig -o [NAME] -c --warnings=false   --source-map [NAME].map   --stats`,
+		//			`mv [NAME].orig [NAME]`,
+		//			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.CSS) == 0 {
 		r.Processors.CSS = []string{
-//			`cssmin < [NAME].orig > [NAME]`,
-			`mv [NAME].orig [NAME]`,
-			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
+		//			`cssmin < [NAME].orig > [NAME]`,
+		//			`mv [NAME].orig [NAME]`,
+		//			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.HTML) == 0 {
 		r.Processors.HTML = []string{
 			`tidy -quiet -indent -asxhtml -utf8 -w 120 --show-warnings false < [NAME].orig > [NAME]`,
-			`sed < [DONE] 's#/index.js#/index.js.gz#' | gzip -f -9 -Sgz  > [NAMEGZ]`,
+			`sed < [NAME] 's#/index.js#/index.js.gz#' | gzip -f -9 -Sgz  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.PHP) == 0 {
 		r.Processors.PHP = []string{
-			`mv [NAME].orig [NAME]`,
+		//			`mv [NAME].orig [NAME]`,
 		}
 	}
 }
