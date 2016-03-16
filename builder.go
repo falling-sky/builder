@@ -89,6 +89,7 @@ func main() {
 				Data:         td,
 				MultiLocale:  tt.multilocale,
 				PostProcess:  tt.postprocess,
+				Compress:     tt.compress,
 			}
 			jobTracker.Add(job)
 

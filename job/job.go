@@ -2,6 +2,7 @@ package job
 
 import (
 	"bytes"
+	"compress/gzip"
 	"io/ioutil"
 	"log"
 	"os/exec"
@@ -35,6 +36,7 @@ type QueueItem struct {
 	Data         *TemplateData
 	EscapeQuotes bool
 	MultiLocale  bool
+	Compress     bool
 }
 
 // QueueTracker is an object for managing QueueItem jobs.
@@ -158,7 +160,7 @@ func TranslateContent(qi *QueueItem, content string) string {
 	return content
 }
 
-func ProcessContent(qi *QueueItem, content string) {
+func ProcessContentFancy(qi *QueueItem, content string) {
 
 	tasks := qi.PostProcess
 
@@ -229,6 +231,53 @@ func ProcessContent(qi *QueueItem, content string) {
 
 }
 
+func ProcessContent(qi *QueueItem, content string) {
+
+	// See if there are commands specified. IF so, run those.
+	tasks := qi.PostProcess
+	if len(tasks) > 0 {
+		ProcessContentFancy(qi, content)
+		return
+	}
+
+	// Otherwise, do writes directly, and do our own compression.
+	uncompressed := qi.Config.Directories.OutputDir + "/" + qi.Filename
+	compressed := qi.Config.Directories.OutputDir + "/" + qi.Filename + ".gz"
+	if qi.MultiLocale == true {
+		uncompressed = uncompressed + "." + qi.PoFile.Language
+		compressed = compressed + "." + qi.PoFile.Language
+	}
+
+	err := ioutil.WriteFile(uncompressed, []byte(content), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// log.Printf("wrote %s etc (%v bytes)\n", outputfilename, len(content))
+
+	if qi.Compress {
+		if strings.HasSuffix(qi.Filename, ".html") {
+			content = strings.Replace(content, `src="/index.js`, `src="/index.js.gz`, -1)
+			content = strings.Replace(content, `href="/index.css`, `href="/index.css.gz`, -1)
+		}
+
+		// Compress in memory
+		b := &bytes.Buffer{}
+		w, err := gzip.NewWriterLevel(b, 9)
+		if err != nil {
+			log.Fatal(err)
+		}
+		w.Write([]byte(content))
+		w.Close()
+
+		// And write
+		err = ioutil.WriteFile(compressed, b.Bytes(), 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+}
+
 // RunJob takes a single QueueItem, and expands, translates, optimizes,
 // and writes files for that single file for a single language.  These are spoon-fed
 // by RunQueue.
@@ -259,7 +308,6 @@ func RunJob(qi *QueueItem) {
 	ParsedCache.lock.Unlock()
 
 	// TODO process translations
-
 	content = TranslateContent(qi, content)
 	ProcessContent(qi, content)
 

@@ -49,13 +49,15 @@ func (r *Record) Defaults() {
 
 	if len(r.Processors.JS) == 0 {
 		r.Processors.JS = []string{
-			`uglifyjs2  [NAME].orig -o [NAME] -c --warnings=false   --source-map [NAME].map   --stats`,
+//			`uglifyjs2  [NAME].orig -o [NAME] -c --warnings=false   --source-map [NAME].map   --stats`,
+			`mv [NAME].orig [NAME]`,
 			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.CSS) == 0 {
 		r.Processors.CSS = []string{
-			`cssmin < [NAME].orig > [NAME]`,
+//			`cssmin < [NAME].orig > [NAME]`,
+			`mv [NAME].orig [NAME]`,
 			`gzip -f -9 -Sgz  < [NAME]  > [NAMEGZ]`,
 		}
 	}
