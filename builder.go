@@ -64,7 +64,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("files: %#v\n", files)
+		//	log.Printf("files: %#v\n", files)
 
 		// Wrapper for launch jobs, gets all the variables into place and in scope
 		launcher := func(file string, locale string, pofile *po.File) {
@@ -98,7 +98,8 @@ func main() {
 		// Start launching specific jobs
 		for _, file := range files {
 			if strings.HasSuffix(file, tt.extension) {
-				launcher(file, "en_US", languages.Pot)
+				//		log.Printf("file=%s\n", file)
+				launcher(file, "en_US", languages.NewPot)
 				if tt.multilocale {
 					for locale, pofile := range languages.ByLanguage {
 						launcher(file, locale, pofile)
@@ -109,5 +110,10 @@ func main() {
 	}
 	// Wait for all jobs to finish
 	jobTracker.Wait()
+
+	err = languages.NewPot.Save(conf.Directories.PoDir + "/falling-sky.newpot")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }

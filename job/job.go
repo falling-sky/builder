@@ -74,14 +74,22 @@ func init() {
 // such as the iput directory path.  The file is cached for future requests.
 func GrabContent(qi *QueueItem) string {
 	topName := qi.RootDir + "/" + qi.Filename
+	log.Printf("GrabContent(%s)  (%s)\n", qi.Filename, qi.PoFile.Language)
 
 	grab := func(fn string) string {
+		//		log.Printf("GrabContent(%s)  (%s) (fn=%s)\n", qi.Filename, qi.PoFile.Language, fn)
+
 		fullname := qi.RootDir + "/" + fn
 		c, err := fileutil.ReadFile(fullname)
 		if err != nil {
 			log.Fatalf("tried to load %s (via %s): %s", fullname, topName, err)
 		}
 		//		log.Printf("read %v (%v bytes)\n", fullname, len(c))
+
+		if qi.PoFile.Language == "en_US" {
+			UpdatePot(qi, c, fn)
+		}
+
 		return c
 	}
 
@@ -132,6 +140,29 @@ func ProcessTemplate(qi *QueueItem, content string) string {
 	}
 
 	return string(wr.Bytes())
+}
+
+func UpdatePot(qi *QueueItem, content string, fn string) {
+	//	log.Printf("UpdatePot fn=%s\n", fn)
+	for {
+
+		matches := reTRANSLATE.FindStringSubmatch(content)
+		if len(matches) == 0 {
+			break
+		}
+		if len(matches) < 2 {
+			log.Fatalf("I don't know what happened, but %s is interesting", matches[0])
+		}
+		wrapperString := matches[0]
+		insideName := matches[1]
+
+		//		log.Printf("UpdatePot inside=%s fn=%s escape=%v\n", insideName, fn, qi.EscapeQuotes)
+
+		qi.PoFile.Add(insideName, fn, qi.EscapeQuotes)
+
+		content = strings.Replace(content, wrapperString, insideName, -1)
+
+	}
 }
 
 // TranslateContent  looks for {{ text }} and replaces it with
@@ -287,8 +318,8 @@ func RunJob(qi *QueueItem) {
 		t1 := time.Now()
 		dur := t1.Sub(t0)
 		ms := int64(dur / time.Millisecond)
-		if ms > 100 {
-			log.Printf("Spent %v ms on %s %s\n", ms, qi.Filename, qi.PoFile.Language)
+		if ms > 0 {
+			//			log.Printf("Spent %v ms on %s %s\n", ms, qi.Filename, qi.PoFile.Language)
 		}
 	}()
 	// log.Printf("RunJob Filename=%s PoLang=%s\n", qi.Filename, qi.PoFile.Language)
@@ -347,7 +378,7 @@ func StartQueue() *QueueTracker {
 	qt.WG = &sync.WaitGroup{}
 
 	maxjobs := runtime.NumCPU()
-	//maxjobs=1
+	maxjobs = 1
 	for i := 0; i < maxjobs; i++ {
 		go qt.RunQueue()
 	}

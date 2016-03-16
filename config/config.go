@@ -63,8 +63,8 @@ func (r *Record) Defaults() {
 	}
 	if len(r.Processors.HTML) == 0 {
 		r.Processors.HTML = []string{
-			`tidy -quiet -indent -asxhtml -utf8 -w 120 --show-warnings false < [NAME].orig > [NAME]`,
-			`sed < [NAME] 's#/index.js#/index.js.gz#' | gzip -f -9 -Sgz  > [NAMEGZ]`,
+		//		`tidy -quiet -indent -asxhtml -utf8 -w 120 --show-warnings false < [NAME].orig > [NAME]`,
+		//		`sed < [NAME] 's#/index.js#/index.js.gz#' | gzip -f -9 -Sgz  > [NAMEGZ]`,
 		}
 	}
 	if len(r.Processors.PHP) == 0 {
