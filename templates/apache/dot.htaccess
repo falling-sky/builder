@@ -20,7 +20,7 @@ ForceLanguagePriority prefer fallback
 # Languages                                                    #
 ################################################################
 
-[% GET AddLanguage %]
+[% .AddLanguage %]
 
 ################################################################
 # file types                                                   #
@@ -56,5 +56,5 @@ RewriteEngine On
 # redirect back to the main page                                    #
 #                                                                   #
 #####################################################################
-Redirect 307 /htrev/ /?htrev=BUILDMD5HASH
+Redirect 307 /htrev/ /?htrev=[% .GitInfo.Version %]-[% .DirSignature %]
 

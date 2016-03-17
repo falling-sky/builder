@@ -24,19 +24,26 @@ import (
 var rePROCESS = regexp.MustCompile(`\[\%\s*PROCESS\s*"(.*?)"\s*\%\]`)
 var reTRANSLATE = regexp.MustCompile(`(?ms){{(.*?)}}`)
 
+// PostType describes a directory, and how to process it.
+type PostInfoType struct {
+	Directory   string
+	Extension   string
+	PostProcess []string
+	EscapeQuote bool
+	MultiLocale bool
+	Compress    bool
+}
+
 // QueueItem represents a single job to be queued, and ran as capacity allows.
 // This is so we can generate the work list up front; and then pace out the work
 // based on number of avaialble CPUs.
 type QueueItem struct {
-	Config       *config.Record
-	RootDir      string
-	Filename     string
-	PoFile       *po.File
-	PostProcess  []string
-	Data         *TemplateData
-	EscapeQuotes bool
-	MultiLocale  bool
-	Compress     bool
+	Config   *config.Record
+	RootDir  string
+	Filename string
+	PoFile   *po.File
+	Data     *TemplateData
+	PostInfo PostInfoType
 }
 
 // QueueTracker is an object for managing QueueItem jobs.
@@ -48,12 +55,14 @@ type QueueTracker struct {
 // TemplateData is passed when adding the job to the queue.
 // This is used by Go's text/template to extract info before expansion.
 type TemplateData struct {
-	GitInfo  *gitinfo.GitInfo
-	PoMap    po.MapStringFile
-	Locale   string
-	Lang     string
-	LangUC   string
-	Basename string
+	GitInfo      *gitinfo.GitInfo
+	PoMap        po.MapStringFile
+	Locale       string
+	Lang         string
+	LangUC       string
+	Basename     string
+	AddLanguage  string
+	DirSignature string
 }
 
 // ParsedCacheType provides properly mutex locked cache access to
@@ -158,7 +167,7 @@ func UpdatePot(qi *QueueItem, content string, fn string) {
 
 		//		log.Printf("UpdatePot inside=%s fn=%s escape=%v\n", insideName, fn, qi.EscapeQuotes)
 
-		qi.PoFile.Add(insideName, fn, qi.EscapeQuotes)
+		qi.PoFile.Add(insideName, fn, qi.PostInfo.EscapeQuote)
 
 		content = strings.Replace(content, wrapperString, insideName, -1)
 
@@ -181,7 +190,7 @@ func TranslateContent(qi *QueueItem, content string) string {
 		insideName := matches[1]
 
 		//	log.Printf("grabbing %v\n", insideName)
-		newContent := qi.PoFile.Translate(insideName, qi.EscapeQuotes)
+		newContent := qi.PoFile.Translate(insideName, qi.PostInfo.EscapeQuote)
 
 		//	log.Printf("Replacing %s with %s\n", wrapperString, newContent)
 
@@ -193,13 +202,13 @@ func TranslateContent(qi *QueueItem, content string) string {
 
 func ProcessContentFancy(qi *QueueItem, content string) {
 
-	tasks := qi.PostProcess
+	tasks := qi.PostInfo.PostProcess
 
 	// Prepare the macros that we support for running external commands.
 	macros := make(map[string]string)
 	macros["NAME"] = qi.Filename
 	macros["NAMEGZ"] = macros["NAME"] + ".gz"
-	if qi.MultiLocale == true {
+	if qi.PostInfo.MultiLocale == true {
 		macros["NAME"] = macros["NAME"] + "." + qi.PoFile.Language
 		macros["NAMEGZ"] = macros["NAMEGZ"] + "." + qi.PoFile.Language
 	}
@@ -265,7 +274,7 @@ func ProcessContentFancy(qi *QueueItem, content string) {
 func ProcessContent(qi *QueueItem, content string) {
 
 	// See if there are commands specified. IF so, run those.
-	tasks := qi.PostProcess
+	tasks := qi.PostInfo.PostProcess
 	if len(tasks) > 0 {
 		ProcessContentFancy(qi, content)
 		return
@@ -274,7 +283,7 @@ func ProcessContent(qi *QueueItem, content string) {
 	// Otherwise, do writes directly, and do our own compression.
 	uncompressed := qi.Config.Directories.OutputDir + "/" + qi.Filename
 	compressed := qi.Config.Directories.OutputDir + "/" + qi.Filename + ".gz"
-	if qi.MultiLocale == true {
+	if qi.PostInfo.MultiLocale == true {
 		uncompressed = uncompressed + "." + qi.PoFile.Language
 		compressed = compressed + "." + qi.PoFile.Language
 	}
@@ -285,7 +294,7 @@ func ProcessContent(qi *QueueItem, content string) {
 	}
 	// log.Printf("wrote %s etc (%v bytes)\n", outputfilename, len(content))
 
-	if qi.Compress {
+	if qi.PostInfo.Compress {
 		if strings.HasSuffix(qi.Filename, ".html") {
 			content = strings.Replace(content, `src="/index.js`, `src="/index.js.gz`, -1)
 			content = strings.Replace(content, `href="/index.css`, `href="/index.css.gz`, -1)

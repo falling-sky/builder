@@ -12,18 +12,11 @@ import (
 	"github.com/falling-sky/builder/gitinfo"
 	"github.com/falling-sky/builder/job"
 	"github.com/falling-sky/builder/po"
+	"github.com/falling-sky/builder/signature"
 )
 
 var configFileName = flag.String("config", "", "config file location (see --example)")
 var configHelp = flag.Bool("example", false, "Dump a configuration example to the screen.")
-
-type postType struct {
-	extension   string
-	postprocess []string
-	escapequote bool
-	multilocale bool
-	compress    bool
-}
 
 func main() {
 	flag.Parse()
@@ -38,11 +31,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var postTable = []postType{
-		{"css", conf.Processors.CSS, false, true, true},
-		{"js", conf.Processors.JS, true, true, true},
-		{"html", conf.Processors.HTML, false, true, true},
-		{"php", conf.Processors.PHP, false, false, false},
+	var postTable = []job.PostInfoType{
+		{"css", ".css", conf.Processors.CSS, false, true, true},
+		{"js", ".css", conf.Processors.JS, true, true, true},
+		{"html", ".html", conf.Processors.HTML, false, true, true},
+		{"php", ".php", conf.Processors.PHP, false, false, false},
+		{"apache", ".htaccess", conf.Processors.Apache, false, false, false},
+		{"apache", ".example", conf.Processors.Apache, false, false, false},
 	}
 
 	// Start the job queue for templates
@@ -59,12 +54,16 @@ func main() {
 	cachedGitInfo := gitinfo.GetGitInfo()
 
 	for _, tt := range postTable {
-		inputDir := conf.Directories.TemplateDir + "/" + tt.extension
+		inputDir := conf.Directories.TemplateDir + "/" + tt.Directory
 		files, err := fileutil.FilesInDirNotRecursive(inputDir)
 		if err != nil {
 			log.Fatal(err)
 		}
 		//	log.Printf("files: %#v\n", files)
+
+		rootDir := conf.Directories.TemplateDir + "/" + tt.Directory
+		addLanguages := languages.ApacheAddLanguage()
+		signature := signature.ScanDir(rootDir, addLanguages)
 
 		// Wrapper for launch jobs, gets all the variables into place and in scope
 		launcher := func(file string, locale string, pofile *po.File) {
@@ -72,24 +71,23 @@ func main() {
 			// Build up what we need to know about the project, that
 			// the templates will ask about.
 			td := &job.TemplateData{
-				GitInfo:  cachedGitInfo,
-				PoMap:    languages.ByLanguage,
-				Locale:   pofile.GetLocale(),
-				Lang:     pofile.GetLang(),
-				LangUC:   pofile.GetLangUC(),
-				Basename: strings.Split(file, ".")[0],
+				GitInfo:      cachedGitInfo,
+				PoMap:        languages.ByLanguage,
+				Locale:       pofile.GetLocale(),
+				Lang:         pofile.GetLang(),
+				LangUC:       pofile.GetLangUC(),
+				Basename:     strings.Split(file, ".")[0],
+				AddLanguage:  addLanguages,
+				DirSignature: signature,
 			}
 
 			job := &job.QueueItem{
-				Config:       conf,
-				RootDir:      conf.Directories.TemplateDir + "/" + tt.extension,
-				Filename:     file,
-				PoFile:       pofile,
-				EscapeQuotes: tt.escapequote,
-				Data:         td,
-				MultiLocale:  tt.multilocale,
-				PostProcess:  tt.postprocess,
-				Compress:     tt.compress,
+				Config:   conf,
+				RootDir:  rootDir,
+				Filename: file,
+				PoFile:   pofile,
+				Data:     td,
+				PostInfo: tt,
 			}
 			jobTracker.Add(job)
 
@@ -97,10 +95,10 @@ func main() {
 
 		// Start launching specific jobs
 		for _, file := range files {
-			if strings.HasSuffix(file, tt.extension) {
+			if strings.HasSuffix(file, tt.Extension) {
 				//		log.Printf("file=%s\n", file)
 				launcher(file, "en_US", languages.NewPot)
-				if tt.multilocale {
+				if tt.MultiLocale {
 					for locale, pofile := range languages.ByLanguage {
 						launcher(file, locale, pofile)
 					}

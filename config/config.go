@@ -15,12 +15,14 @@ type Record struct {
 		OutputDir   string
 	}
 	Processors struct {
-		Note []string
-		JS   []string
-		CSS  []string
-		HTML []string
-		PHP  []string
+		Note   []string
+		JS     []string
+		CSS    []string
+		HTML   []string
+		PHP    []string
+		Apache []string
 	}
+	Map map[string]string
 }
 
 // Defaults will update a config record with safe defaults for any missing values
@@ -72,6 +74,22 @@ func (r *Record) Defaults() {
 		//			`mv [NAME].orig [NAME]`,
 		}
 	}
+	if len(r.Processors.Apache) == 0 {
+		r.Processors.PHP = []string{
+		//			`mv [NAME].orig [NAME]`,
+		}
+	}
+
+	if r.Map == nil {
+		r.Map = make(map[string]string)
+	}
+	if len(r.Map) == 0 {
+		r.Map["dot.htaccess"] = ".htaccess"
+		r.Map["ip.htaccess"] = "ip/.htaccess"
+		r.Map["images.htaccess"] = "images/.htaccess"
+		r.Map["images-nc.htaccess"] = "images-nc/.htaccess"
+	}
+
 }
 
 // Load a config file, return it after adjusting for defaults

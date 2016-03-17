@@ -1,6 +1,7 @@
 package po
 
 import (
+	"fmt"
 	"regexp"
 	"sort"
 	"strconv"
@@ -137,5 +138,32 @@ func (f *File) Add(input string, context string, escapequotes bool) {
 			newtext = strings.Replace(newtext, `'`, `\'`, -1)
 		}
 	*/
+
+}
+
+// ApacheAddLanguage  Generates the Apache "AddLanguage" text
+func (f *Files) ApacheAddLanguage() string {
+	list := append([]string{"en_US"}, f.Languages()...)
+	text := ""
+	seen := make(map[string]bool)
+
+	add := func(s string) {
+		if seen[s] == false {
+			text = text + s + "\n"
+			seen[s] = true
+		}
+	}
+
+	for _, locale := range list {
+		parts := strings.Split(locale, "_")
+		if len(parts) > 0 {
+			add(fmt.Sprintf("AddLanguage %s .%s", parts[0], locale))
+		}
+		dashed := strings.Replace(locale, "_", "-", -1)
+		add(fmt.Sprintf("AddLanguage %s .%s", dashed, locale))
+
+	}
+
+	return text
 
 }
