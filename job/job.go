@@ -5,7 +5,9 @@ import (
 	"compress/gzip"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -204,9 +206,14 @@ func ProcessContentFancy(qi *QueueItem, content string) {
 
 	tasks := qi.PostInfo.PostProcess
 
+	basename := qi.Filename
+	if t, ok := qi.Config.Map[qi.Filename]; ok {
+		basename = t
+	}
+
 	// Prepare the macros that we support for running external commands.
 	macros := make(map[string]string)
-	macros["NAME"] = qi.Filename
+	macros["NAME"] = basename
 	macros["NAMEGZ"] = macros["NAME"] + ".gz"
 	if qi.PostInfo.MultiLocale == true {
 		macros["NAME"] = macros["NAME"] + "." + qi.PoFile.Language
@@ -232,6 +239,7 @@ func ProcessContentFancy(qi *QueueItem, content string) {
 
 	// First, write the file to disk.
 	outputfilename := qi.Config.Directories.OutputDir + "/" + macros["INPUT"]
+	os.MkdirAll(filepath.Dir(outputfilename), 0755)
 
 	err := ioutil.WriteFile(outputfilename, []byte(content), 0755)
 	if err != nil {
@@ -280,13 +288,23 @@ func ProcessContent(qi *QueueItem, content string) {
 		return
 	}
 
+	basename := qi.Filename
+	if t, ok := qi.Config.Map[qi.Filename]; ok {
+		basename = t
+	}
+
 	// Otherwise, do writes directly, and do our own compression.
-	uncompressed := qi.Config.Directories.OutputDir + "/" + qi.Filename
-	compressed := qi.Config.Directories.OutputDir + "/" + qi.Filename + ".gz"
+	uncompressed := qi.Config.Directories.OutputDir + "/" + basename
+	compressed := qi.Config.Directories.OutputDir + "/" + basename + ".gz"
 	if qi.PostInfo.MultiLocale == true {
 		uncompressed = uncompressed + "." + qi.PoFile.Language
 		compressed = compressed + "." + qi.PoFile.Language
 	}
+
+	// Make sure the directory exists.
+	// We may need to keep track of this;
+	// do we really want to do this 1000+ times?
+	os.MkdirAll(filepath.Dir(uncompressed), 0755)
 
 	err := ioutil.WriteFile(uncompressed, []byte(content), 0644)
 	if err != nil {
