@@ -22,7 +22,10 @@ type Record struct {
 		PHP    []string
 		Apache []string
 	}
-	Map map[string]string
+	Map     map[string]string
+	Options struct {
+		MaxThreads int
+	}
 }
 
 // Defaults will update a config record with safe defaults for any missing values
@@ -75,7 +78,7 @@ func (r *Record) Defaults() {
 		}
 	}
 	if len(r.Processors.Apache) == 0 {
-		r.Processors.PHP = []string{
+		r.Processors.Apache = []string{
 		//			`mv [NAME].orig [NAME]`,
 		}
 	}

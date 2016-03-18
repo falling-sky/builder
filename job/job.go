@@ -320,7 +320,7 @@ func ProcessContent(qi *QueueItem, content string) {
 
 		// Compress in memory
 		b := &bytes.Buffer{}
-		w, err := gzip.NewWriterLevel(b, 9)
+		w, err := gzip.NewWriterLevel(b, gzip.BestCompression)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -399,13 +399,15 @@ func (qt *QueueTracker) Wait() {
 
 // StartQueue will start a goroutine for jobs, and return
 // a handle to be used for adding and waiting on jobs.
-func StartQueue() *QueueTracker {
+func StartQueue(maxjobs int) *QueueTracker {
 	qt := &QueueTracker{}
 	qt.Channel = make(chan *QueueItem, 10000)
 	qt.WG = &sync.WaitGroup{}
 
-	maxjobs := runtime.NumCPU()
-	maxjobs = 1
+	if maxjobs == 0 {
+		maxjobs = runtime.NumCPU()
+	}
+	//maxjobs = 1
 	for i := 0; i < maxjobs; i++ {
 		go qt.RunQueue()
 	}

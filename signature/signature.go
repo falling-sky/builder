@@ -25,7 +25,7 @@ func ScanDir(directory string, otherstuff ...string) string {
 		}
 
 		fn := directory + "/" + file
-		log.Printf("scanning %s\n", fn)
+		//	log.Printf("scanning %s\n", fn)
 
 		// This will cache, saving a trip for other jobs
 		content, err := fileutil.ReadFile(fn)

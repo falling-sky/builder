@@ -44,6 +44,22 @@ func copyImages(source string, dest string) {
 	}
 }
 
+func prepOutput(dir string) {
+	log.Printf("Prepping %s\n", dir)
+	if dir == "" {
+		log.Fatal("dir empty, unexpected")
+	}
+	os.MkdirAll(dir, 0755)   // Make sure it exists, so that RemoveAll won't fail
+	err := os.RemoveAll(dir) // Remove all - including old files, subdirs, etc.
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = os.MkdirAll(dir, 0755) // Make sure the directory now exists, for real.
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -56,6 +72,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	prepOutput(conf.Directories.OutputDir)
 
 	var postTable = []job.PostInfoType{
 		{
@@ -109,7 +127,7 @@ func main() {
 	}
 
 	// Start the job queue for templates
-	jobTracker := job.StartQueue()
+	jobTracker := job.StartQueue(conf.Options.MaxThreads)
 
 	// Load all langauges, calculate all percentages of completion.
 	languages, err := po.LoadAll(conf.Directories.PoDir+"/falling-sky.pot", conf.Directories.PoDir+"/dl")
