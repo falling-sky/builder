@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/falling-sky/builder/config"
@@ -18,6 +20,30 @@ import (
 var configFileName = flag.String("config", "", "config file location (see --example)")
 var configHelp = flag.Bool("example", false, "Dump a configuration example to the screen.")
 
+func copyImages(source string, dest string) {
+	log.Printf("copyImages(%s,%s)\n", source, dest)
+	files, err := fileutil.FilesInDirNotRecursive(source)
+	if err != nil {
+		log.Fatal(err)
+	}
+	os.MkdirAll(dest, 0755)
+	for _, f := range files {
+		ext := strings.ToLower(filepath.Ext(f))
+		if !(ext == ".png" || ext == ".gif" || ext == ".jpg" || ext == ".jpeg") {
+			continue
+		}
+		log.Printf("copyImages(%s,%s) (%s)\n", source, dest, f)
+		b, e := ioutil.ReadFile(source + "/" + f)
+		if e != nil {
+			log.Fatal(err)
+		}
+		e = ioutil.WriteFile(dest+"/"+f, b, 0644)
+		if e != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func main() {
 	flag.Parse()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -30,15 +56,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	/*
-		Directory   string
-		Extension   string
-		PostProcess []string
-		EscapeQuote bool
-		MultiLocale bool
-		Compress    bool
-	*/
 
 	var postTable = []job.PostInfoType{
 		{
@@ -157,8 +174,13 @@ func main() {
 			}
 		}
 	}
-	// Wait for all jobs to finish
+
+	// Wait for all process jobs to finish
 	jobTracker.Wait()
+
+	// Copy images
+	copyImages(conf.Directories.TemplateDir+"/images", conf.Directories.OutputDir+"/images")
+	copyImages(conf.Directories.TemplateDir+"/images", conf.Directories.OutputDir+"/images-nc")
 
 	err = languages.NewPot.Save(conf.Directories.PoDir + "/falling-sky.newpot")
 	if err != nil {
