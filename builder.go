@@ -31,13 +31,64 @@ func main() {
 		log.Fatal(err)
 	}
 
+	/*
+		Directory   string
+		Extension   string
+		PostProcess []string
+		EscapeQuote bool
+		MultiLocale bool
+		Compress    bool
+	*/
+
 	var postTable = []job.PostInfoType{
-		{"css", ".css", conf.Processors.CSS, false, true, true},
-		{"js", ".css", conf.Processors.JS, true, true, true},
-		{"html", ".html", conf.Processors.HTML, false, true, true},
-		{"php", ".php", conf.Processors.PHP, false, false, false},
-		{"apache", ".htaccess", conf.Processors.Apache, false, false, false},
-		{"apache", ".example", conf.Processors.Apache, false, false, false},
+		{
+			Directory:   "css",
+			Extension:   ".css",
+			PostProcess: conf.Processors.CSS,
+			EscapeQuote: false,
+			MultiLocale: true,
+			Compress:    true,
+		},
+		{
+			Directory:   "js",
+			Extension:   ".css",
+			PostProcess: conf.Processors.JS,
+			EscapeQuote: true,
+			MultiLocale: true,
+			Compress:    true,
+		},
+		{
+			Directory:   "html",
+			Extension:   ".html",
+			PostProcess: conf.Processors.HTML,
+			EscapeQuote: false,
+			MultiLocale: true,
+			Compress:    true,
+		},
+		{
+			Directory:   "php",
+			Extension:   ".php",
+			PostProcess: conf.Processors.PHP,
+			EscapeQuote: false,
+			MultiLocale: false,
+			Compress:    false,
+		},
+		{
+			Directory:   "apache",
+			Extension:   ".htaccess",
+			PostProcess: conf.Processors.Apache,
+			EscapeQuote: false,
+			MultiLocale: false,
+			Compress:    false,
+		},
+		{
+			Directory:   "apache",
+			Extension:   ".example",
+			PostProcess: conf.Processors.Apache,
+			EscapeQuote: false,
+			MultiLocale: false,
+			Compress:    false,
+		},
 	}
 
 	// Start the job queue for templates
