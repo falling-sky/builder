@@ -10,9 +10,11 @@ import (
 // Record contains configuration options
 type Record struct {
 	Directories struct {
-		TemplateDir string
-		PoDir       string
-		OutputDir   string
+		TemplateDir    string
+		ImagesDir      string
+		TransparentDir string
+		PoDir          string
+		OutputDir      string
 	}
 	Processors struct {
 		Note   []string
@@ -32,6 +34,12 @@ type Record struct {
 func (r *Record) Defaults() {
 	if r.Directories.TemplateDir == "" {
 		r.Directories.TemplateDir = "templates"
+	}
+	if r.Directories.ImagesDir == "" {
+		r.Directories.ImagesDir = "images"
+	}
+	if r.Directories.TransparentDir == "" {
+		r.Directories.TransparentDir = "transparent"
 	}
 	if r.Directories.PoDir == "" {
 		r.Directories.PoDir = "translations"

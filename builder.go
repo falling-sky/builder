@@ -20,28 +20,47 @@ import (
 var configFileName = flag.String("config", "", "config file location (see --example)")
 var configHelp = flag.Bool("example", false, "Dump a configuration example to the screen.")
 
-func copyImages(source string, dest string) {
-	log.Printf("copyImages(%s,%s)\n", source, dest)
-	files, err := fileutil.FilesInDirNotRecursive(source)
+func copyHelper(source string, dest string, fn func(string) ([]string, error)) {
+	files, err := fn(source)
 	if err != nil {
 		log.Fatal(err)
 	}
-	os.MkdirAll(dest, 0755)
+	seen := make(map[string]bool)
 	for _, f := range files {
-		ext := strings.ToLower(filepath.Ext(f))
-		if !(ext == ".png" || ext == ".gif" || ext == ".jpg" || ext == ".jpeg") {
-			continue
+		if strings.HasSuffix(f, "~") {
+			continue // Skip editor backups
 		}
-		log.Printf("copyImages(%s,%s) (%s)\n", source, dest, f)
+		log.Printf("copy %s/%s to %s/%s\n", source, f, dest, f)
+
+		// Read the file.
 		b, e := ioutil.ReadFile(source + "/" + f)
 		if e != nil {
 			log.Fatal(err)
 		}
+
+		// Create directory, if needed.
+		dir := filepath.Dir(dest + "/" + f)
+		if _, ok := seen[dir]; ok == false {
+			seen[dir] = true
+			os.MkdirAll(dir, 0755)
+		}
+
+		// Write the file.
 		e = ioutil.WriteFile(dest+"/"+f, b, 0644)
 		if e != nil {
 			log.Fatal(err)
 		}
 	}
+}
+
+func copyFiles(source string, dest string) {
+	log.Printf("copyFiles(%s,%s)\n", source, dest)
+	copyHelper(source, dest, fileutil.FilesInDirNotRecursive)
+}
+
+func copyFilesAll(source string, dest string) {
+	log.Printf("copyFiles(%s,%s)\n", source, dest)
+	copyHelper(source, dest, fileutil.FilesInDirRecursive)
 }
 
 func prepOutput(dir string) {
@@ -81,12 +100,12 @@ func main() {
 			Extension:   ".css",
 			PostProcess: conf.Processors.CSS,
 			EscapeQuote: false,
-			MultiLocale: true,
+			MultiLocale: false,
 			Compress:    true,
 		},
 		{
 			Directory:   "js",
-			Extension:   ".css",
+			Extension:   ".js",
 			PostProcess: conf.Processors.JS,
 			EscapeQuote: true,
 			MultiLocale: true,
@@ -197,8 +216,13 @@ func main() {
 	jobTracker.Wait()
 
 	// Copy images
-	copyImages(conf.Directories.TemplateDir+"/images", conf.Directories.OutputDir+"/images")
-	copyImages(conf.Directories.TemplateDir+"/images", conf.Directories.OutputDir+"/images-nc")
+	copyFiles(conf.Directories.ImagesDir, conf.Directories.OutputDir+"/images")
+	copyFiles(conf.Directories.ImagesDir, conf.Directories.OutputDir+"/images-nc")
+	copyFilesAll(conf.Directories.TransparentDir, conf.Directories.OutputDir+"/transparent")
+
+	// A couple last minute symlinks
+	os.Symlink(".", conf.Directories.OutputDir+"/isp")
+	os.Symlink(".", conf.Directories.OutputDir+"/helpdesk")
 
 	err = languages.NewPot.Save(conf.Directories.PoDir + "/falling-sky.newpot")
 	if err != nil {
